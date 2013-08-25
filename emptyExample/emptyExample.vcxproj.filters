@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\testApp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GridCollisionDetection.cpp">
+      <Filter>src\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ChainCode.cpp">
+      <Filter>src\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="src\EdgeMap.cpp">
+      <Filter>src\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SpacingMap.cpp">
+      <Filter>src\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Particle.cpp">
+      <Filter>src\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleGroups.cpp">
+      <Filter>src\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleManager.cpp">
+      <Filter>src\Particles</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{d8376475-7454-4a24-b08a-aac121d3ad6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\common">
+      <UniqueIdentifier>{6c90ce17-ff62-4d7b-9a6d-ed258f9840ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Grid">
+      <UniqueIdentifier>{5415abab-b5bb-4ec6-a2de-8ab7d16f9d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Map">
+      <UniqueIdentifier>{c0571189-16e7-475c-a115-2e887be6ba22}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Particles">
+      <UniqueIdentifier>{e350dccc-f49e-459d-abb2-fe5e60052af6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\testApp.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gaussian.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Sob.h">
+      <Filter>src\common</Filter>
+    </ClInclude>
+    <ClInclude Include="src\GridCollisionDetection.h">
+      <Filter>src\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ChainCode.h">
+      <Filter>src\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\EdgeMap.h">
+      <Filter>src\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SpacingMap.h">
+      <Filter>src\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle.h">
+      <Filter>src\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleGroups.h">
+      <Filter>src\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleManager.h">
+      <Filter>src\Particles</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="icon.rc" />
+  </ItemGroup>
+</Project>
