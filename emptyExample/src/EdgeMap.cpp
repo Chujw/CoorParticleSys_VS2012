@@ -43,14 +43,7 @@ void EdgeMap::InitEdgeMap(int this_id)
 //-----------------------------------------------------------------
 void EdgeMap::MakeImages()
 {
-	//MakeCircle();
-	//EG_map.loadImage("data/singleline.bmp");
-	canvas.loadImage("Tiger.jpg");
-	//EG_map.loadImage("data/circles.bmp");
-	//EG_map.loadImage("data/star.bmp");
-	//EG_map.loadImage("balloon.jpg");
-	//int x = ofGetWidth();
-	//int y = ofGetHeight();
+	canvas.loadImage("bridge.jpg");
 	canvas.resize(ofGetWidth(), ofGetHeight());
 	canvas.setImageType(OF_IMAGE_GRAYSCALE);
 	SetupGrayValue();	// store the gray value of each pixel

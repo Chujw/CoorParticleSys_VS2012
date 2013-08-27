@@ -167,7 +167,7 @@ void ParticleGroups::Setup_parlist_open(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_OpenArea_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("Tiger_thresh130.jpg");
+	testImage.loadImage("bridge_thresh.jpg");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
