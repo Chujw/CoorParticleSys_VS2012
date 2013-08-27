@@ -43,7 +43,7 @@ void EdgeMap::InitEdgeMap(int this_id)
 //-----------------------------------------------------------------
 void EdgeMap::MakeImages()
 {
-	canvas.loadImage("bridge.jpg");
+	canvas.loadImage("TheScream.jpg");
 	canvas.resize(ofGetWidth(), ofGetHeight());
 	canvas.setImageType(OF_IMAGE_GRAYSCALE);
 	SetupGrayValue();	// store the gray value of each pixel
