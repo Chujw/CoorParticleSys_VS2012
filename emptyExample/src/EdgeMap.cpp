@@ -1,24 +1,6 @@
 #include "EdgeMap.h"
 
 
-//--------------------------------------------------
-// small handy functions
-//--------------------------------------------------
-//float dist(ofVec2f A, ofVec2f B)
-//{
-//	return sqrt((A.x-B.x)*(A.x-B.x)+(A.y-B.y)*(A.y-B.y));
-//}
-//
-//Particle midpAB(Particle* A, Particle* B)
-//{
-//	Particle midpoint;
-//	midpoint.pos.x = (A->pos.x+B->pos.x)/2;
-//	midpoint.pos.y = (A->pos.y+B->pos.y)/2;
-//	return midpoint;
-//}
-
-//-----------------------------------------------------------------
-
 void EdgeMap::InitEdgeMap(int this_id)
 {
 	bkgchain_num = 0;
@@ -27,8 +9,6 @@ void EdgeMap::InitEdgeMap(int this_id)
 	id = this_id;
 	//ofSetColor(255);
 	EG_map.allocate(ofGetWidth(),ofGetHeight(),OF_IMAGE_GRAYSCALE);
-	//close_edgechain.resize(CHAIN_NUM);
-	//open_edgechain.resize(CHAIN_NUM);
 	bkg_edgechain = new ofVec2f[CHAIN_NUM];
 	forg_edgechain = new ofVec2f[CHAIN_NUM];
 	AllPixelsInChain = new ofVec2f[CHAIN_NUM];
@@ -147,7 +127,6 @@ ofVec2f* EdgeMap::MakeBkgEdgeChains(ofVec2f StartpA, ofVec2f EndpB, int* chain_n
 		{
 			float y = k * (x - StartpA.x) + StartpA.y; 
 			LinePixel[allpixel_num++] = ofVec2f(floor(x+0.5),floor(y+0.5));
-			//*chain_num = openchain_num;
 		}
 	}
 	else if(StartpA.x == EndpB.x)	// if it is a verticle thread line
@@ -236,7 +215,6 @@ bool EdgeMap::MakeOpenEdgeChainsFromThreadEdge(ofVec2f StartpA, ofVec2f EndpB, i
 		{
 			float y = k * (x - StartpA.x) + StartpA.y; 
 			LinePixel[allpixel_num++] = ofVec2f(floor(x+0.5),floor(y+0.5));
-			//*chain_num = openchain_num;
 		}
 	}
 	else if(StartpA.x == EndpB.x)	// if it is a verticle thread line
@@ -251,7 +229,6 @@ bool EdgeMap::MakeOpenEdgeChainsFromThreadEdge(ofVec2f StartpA, ofVec2f EndpB, i
 		{
 			float x = StartpA.x; 
 			LinePixel[allpixel_num++] = ofVec2f(floor(x+0.5),floor(y+0.5));
-			//*chain_num = openchain_num;
 		}
 	}
 	else	// when it is a B--A line
@@ -262,7 +239,6 @@ bool EdgeMap::MakeOpenEdgeChainsFromThreadEdge(ofVec2f StartpA, ofVec2f EndpB, i
 		{
 			float y = k * (x - StartpA.x) + StartpA.y; 
 			LinePixel[allpixel_num++] = ofVec2f(floor(x+0.5),floor(y+0.5));
-			//*chain_num = openchain_num;
 		}
 	}
 
@@ -416,11 +392,3 @@ float* EdgeMap::GetGrayscaleMap()
 {
 	return grayscale_pixels;
 }
-
-
-///////////////////////////////////////////////
-//////////////EDGE TYPE///////////////////////
-//--------------------------------------------
-//			0				1			2
-//		circle			straight
-//--------------------------------------------

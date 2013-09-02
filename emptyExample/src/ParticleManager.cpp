@@ -84,14 +84,15 @@ void ParticleManager::Simulate(ofImage* canvas)
 {
 	if(!Mngr_canstop)
 	{
-		if(!parGroup[2].GetStopSignal())
-			parGroup[2].Simulate(m_spacing, canvas);
+		//// uncomment it if need a third group
+		//if(!parGroup[2].GetStopSignal())
+		//	parGroup[2].Simulate(m_spacing, canvas);
 		
+		if(!parGroup[0].GetStopSignal())
+			parGroup[0].Simulate(m_spacing, canvas);
+
 		else if(!parGroup[1].GetStopSignal())
 			parGroup[1].Simulate(m_spacing, canvas);
-
-		else if(!parGroup[0].GetStopSignal())
-			parGroup[0].Simulate(m_spacing, canvas);
 		else
 		{
 			Mngr_canstop = true;
