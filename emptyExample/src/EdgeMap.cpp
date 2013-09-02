@@ -30,7 +30,7 @@ void EdgeMap::InitEdgeMap(int this_id)
 	//close_edgechain.resize(CHAIN_NUM);
 	//open_edgechain.resize(CHAIN_NUM);
 	bkg_edgechain = new ofVec2f[CHAIN_NUM];
-	open_edgechain = new ofVec2f[CHAIN_NUM];
+	forg_edgechain = new ofVec2f[CHAIN_NUM];
 	AllPixelsInChain = new ofVec2f[CHAIN_NUM];
 	start_edgepx.set(-1,-1);
 	grayscale_pixels = new float[ofGetWidth()*ofGetHeight()];
@@ -43,7 +43,7 @@ void EdgeMap::InitEdgeMap(int this_id)
 //-----------------------------------------------------------------
 void EdgeMap::MakeImages()
 {
-	canvas.loadImage("TheScream.jpg");
+	canvas.loadImage("Panda.jpg");
 	canvas.resize(ofGetWidth(), ofGetHeight());
 	canvas.setImageType(OF_IMAGE_GRAYSCALE);
 	SetupGrayValue();	// store the gray value of each pixel
@@ -221,27 +221,12 @@ void EdgeMap::ReverseEdgeChain(ofVec2f* edgechain, int numpt)
 bool EdgeMap::MakeOpenEdgeChainsFromThreadEdge(ofVec2f StartpA, ofVec2f EndpB, int* chain_num, float DefaultSpacing)
 {
 	cout<<"Making the edge chains from given tread points..."<<endl;
-	//if(StartpA.y > EndpB.y)	// switch the position of A and B to make sure the A is above B
-	//{
-	//	ofVec2f temp = StartpA;
-	//	StartpA = EndpB;
-	//	EndpB = temp;
-	//}
-	//else if(StartpA.y == EndpB.y)
-	//{
-	//	if(StartpA.x < EndpB.x)	// switch the position to make sure A is at the right side of B 
-	//	{
-	//		ofVec2f temp = StartpA;
-	//		StartpA = EndpB;
-	//		EndpB = temp;
-	//	}
-	//}
 	//-------------------------------------------
 	// get all the pixels on the thread line
 	//-------------------------------------------
 	int size = 2*StartpA.distance(EndpB);
 	int allpixel_num = 0;
-	open_edgechain = new ofVec2f[size];
+	forg_edgechain = new ofVec2f[size];
 	ofVec2f* LinePixel = new ofVec2f[size];
 	if(StartpA.x < EndpB.x)	// when it is an A--B line
 	{
@@ -292,12 +277,10 @@ bool EdgeMap::MakeOpenEdgeChainsFromThreadEdge(ofVec2f StartpA, ofVec2f EndpB, i
 		if(dis_count>=DefaultSpacing)
 		{
 			dis_count = 0;
-			open_edgechain[openchain_num++] = LinePixel[i];
+			forg_edgechain[openchain_num++] = LinePixel[i];
 			*chain_num = openchain_num;
 		}
 	}
-
-
 
 	if(openchain_num >0)
 		return true;
@@ -392,9 +375,9 @@ ofImage EdgeMap::GetEdgeMap()
 	return EG_map;
 }
 
-ofVec2f* EdgeMap::GetOpenEdgeChain()
+ofVec2f* EdgeMap::GetForgEdgeChain()
 {
-	return open_edgechain;
+	return forg_edgechain;
 }
 
 ofVec2f* EdgeMap::GetAllPixelsInChain(int* allpixels_num)

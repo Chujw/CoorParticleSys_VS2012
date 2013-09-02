@@ -22,7 +22,7 @@ Particle midpAB(Particle* A, Particle* B)
 void ParticleGroups::Setup()
 {
 	canstop = false;
-	Is_open = false;
+	Is_Foreground = false;
 	FillGrids = false;
 	numpt = 0;	// num of released regular particles
 	particle.resize(CHAIN_NUM);
@@ -38,9 +38,9 @@ void ParticleGroups::Setup()
 // Setup particle list for close contour area
 //
 //---------------------------------------------
-void ParticleGroups::Setup_parlist_close(ofVec2f* closeEdgechain, int closepar_numpt, SpacingMap m_spacing)
+void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_numpt, SpacingMap m_spacing)
 {
-	Is_open = false; // this par group will work for close area
+	Is_Foreground = false; // this par group will work for close area
 	numpt = closepar_numpt;
 	beacon_num = numpt;
 	for(int i=0; i<numpt; i++)
@@ -97,10 +97,10 @@ void ParticleGroups::Setup_parlist_close(ofVec2f* closeEdgechain, int closepar_n
 // Setup particle list for open area
 //	in open area, pars moves to a main predefined direction
 //-----------------------------------------------------------
-void ParticleGroups::Setup_parlist_open(ofVec2f* openEdgechain, int openpar_numpt, SpacingMap m_spacing)
+void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_numpt, SpacingMap m_spacing)
 {
 	cout<<"Setting up the parlist for open areas..."<<endl;
-	Is_open = true;	// this par group will work for open area
+	Is_Foreground = true;	// this par group will work for open area
 	numpt = openpar_numpt;
 	beacon_num = numpt;
 	for(int i=0; i<numpt; i++)
@@ -158,135 +158,67 @@ void ParticleGroups::Setup_parlist_open(ofVec2f* openEdgechain, int openpar_nump
 }
 
 
-//----------------------------------------------
+//--------------------------------------------------------------
 //
 // Setup the map of open area with the parlist
 //	walk through the parlist of close area, mark
-//	inner pixels as true, outside as false
-//---------------------------------------------
-void ParticleGroups::Setup_OpenArea_map(ofVec2f* AllPixelsInChain, int allpixels_num)
+//	inner pixels as true, outside as false. For now
+//  the map is imported by a preprocessed thresholding map
+//--------------------------------------------------------------
+void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("TheScream_thresh.jpg");
+	testImage.loadImage("3GrpPanda.jpg");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
 
-
-	////ofImage segmentImage;
-	////segmentImage.clone(srcImage);
-	////unsigned char* testedgepixel = segmentImage.getPixels();
-	////// find the mean intensitive
-	////float mean_inten = testedgepixel[0];
-	////for(float i=1; i<ofGetWidth()*ofGetHeight(); i++)
-	////{
-	////	float diff = mean_inten-testedgepixel[int(i)];
-	////	diff = diff * (i/(i+1));
-	////	mean_inten -= diff;
-	////}
-	//////mean_inten = mean_inten/ofGetWidth()*ofGetHeight();
-	////// thresholding the source image
-	////for(int i=0; i<ofGetWidth()*ofGetHeight(); i++)
-	////{
-	////	if(testedgepixel[i]>=/*mean_inten*/80)
-	////		testedgepixel[i] = 255;
-	////	else
-	////		testedgepixel[i] = 0;
-	////}
-
-	OpenArea_map = new bool[ofGetWidth()*ofGetHeight()];
+	Foreground_map = new bool[ofGetWidth()*ofGetHeight()];
 	for(int i =0; i<ofGetWidth(); i++)
 	{
 		for(int j = 0; j<ofGetHeight(); j++)
 		{
-			if(testedgepixel[i+j*ofGetWidth()] !=0)
-				OpenArea_map[i+j*ofGetWidth()] = false;
-			else
-				OpenArea_map[i+j*ofGetWidth()] = true;
+			if(testedgepixel[i+j*ofGetWidth()] ==0)
+				Foreground_map[i+j*ofGetWidth()] = true;
+			else // all pixels with color (not neccessary to be black) is included in the map
+				Foreground_map[i+j*ofGetWidth()] = false;
 		}
 	}
-
-	////cout<<"Setting up the map of OpenArea..."<<endl;
-	////OpenArea_map = new bool[ofGetWidth()*ofGetHeight()];
-	/////////allpixels_num = 3256;
-	//////-----------------------------------------------------------------
-	////// Make a image which has all chain pixels black and others white
-	//////-----------------------------------------------------------------
-	////unsigned char* edgepixel = new unsigned char[ofGetWidth()*ofGetHeight()];
-	////for(int i=0; i<ofGetWidth()*ofGetHeight(); i++)
-	////	edgepixel[i] = 255;
-	////	
-	////for(int px=0; px<allpixels_num; px++)
-	////{
-	////	int index = AllPixelsInChain[px].x + AllPixelsInChain[px].y*ofGetWidth();
-	////	edgepixel[index] = 0;
-	////}
-
-	//////---------------------------------------------------------------
-	////// find the Min and Max position particles from AllPixelsInChain
-	//////---------------------------------------------------------------
-	////ofVec2f Min_par = ofVec2f(AllPixelsInChain[0].x,AllPixelsInChain[0].y);
-	////ofVec2f Max_par = ofVec2f(AllPixelsInChain[0].x,AllPixelsInChain[0].y);
-	////for(int i = 1; i<allpixels_num; i++)
-	////{
-	////	// find the min par for the open area
-	////	if(Min_par.x>AllPixelsInChain[i].x)
-	////		Min_par.x = AllPixelsInChain[i].x;
-	////	if(Min_par.y>AllPixelsInChain[i].y)
-	////		Min_par.y = AllPixelsInChain[i].y;
-	////	// find the max par for the open area
-	////	if(Max_par.x<AllPixelsInChain[i].x)
-	////		Max_par.x = AllPixelsInChain[i].x;
-	////	if(Max_par.y<AllPixelsInChain[i].y)
-	////		Max_par.y = AllPixelsInChain[i].y;
-	////}
-	////// Give the area boundary some extra room
-	////Min_par.x -= 2;
-	////Min_par.y -= 2;
-	////Max_par.x += 2;
-	////Max_par.y += 2;
-	////cout<<"--Found the Min_par and the Max_par. Now build the map..."<<endl;
-	//////-----------------------------------------------
-	////// Build the map
-	//////-----------------------------------------------
-	////for(int j = 0; j<ofGetHeight(); j++)
-	////{
-	////	for(int i = 0; i<ofGetWidth(); i++)
-	////	{
-	////		if(i>Min_par.x && i<Max_par.x && j>Min_par.y && j<Max_par.y)
-	////		{
-	////			// inside the boundary, check more carefully with edgemap
-	////			// draw a straight line from thispar to boundary line, 
-	////			// if it cross edge pixels odd times, the par is inside; otherwise, outside.
-	////			int cross_count = 0;
-	////			int last_color = edgepixel[i + j*ofGetWidth()];	// 0 as Black, 255 as White
-	////			for(int index_x=i; index_x<Max_par.x; index_x++)
-	////			{
-	////				int this_color = edgepixel[index_x + j*ofGetWidth()];
-	////				if(this_color == 0 && last_color == 255)	// move from a white pixel to a black pixel
-	////					cross_count++;
-	////				last_color = this_color;
-	////			}
-	////			if(cross_count%2==0)	// even
-	////				OpenArea_map[i+j*ofGetWidth()] = false;
-	////			else	// odd
-	////			{
-	////				OpenArea_map[i+j*ofGetWidth()] = true;
-	////				////cout<<"OpenArea_map["<<i<<"] ["<<j<<"] = true"<<endl;
-	////			}
-	////		}
-	////		else
-	////			OpenArea_map[i+j*ofGetWidth()] = false;
-	////	}
-	////}
-
 	//make all the edge pixels as true;
 	for(int i = 0; i<allpixels_num; i++)
 	{
 		int index = AllPixelsInChain[i].x + AllPixelsInChain[i].y*ofGetWidth();
-		OpenArea_map[index] = true;
+		Foreground_map[index] = true;
 	}
-	cout<<"--Finished the map of OpenArea"<<endl;
+	cout<<"--Finished the map of foreground objects"<<endl;
+}
+
+void ParticleGroups::Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
+{
+	ofImage testImage;
+	testImage.loadImage("3GrpPanda.jpg");
+	testImage.resize(ofGetWidth(),ofGetHeight());
+	testImage.setImageType(OF_IMAGE_GRAYSCALE);
+	unsigned char* testedgepixel = testImage.getPixels();
+
+	Foreground_map = new bool[ofGetWidth()*ofGetHeight()];
+	for(int i =0; i<ofGetWidth(); i++)
+	{
+		for(int j = 0; j<ofGetHeight(); j++)
+		{
+			if(testedgepixel[i+j*ofGetWidth()] !=0 && testedgepixel[i+j*ofGetWidth()] != 255)
+				Foreground_map[i+j*ofGetWidth()] = true;
+			else // all pixels with color (not neccessary to be black) is included in the map
+				Foreground_map[i+j*ofGetWidth()] = false;
+		}
+	}
+	//make all the edge pixels as true;
+	//for(int i = 0; i<allpixels_num; i++)
+	//{
+	//	int index = AllPixelsInChain[i].x + AllPixelsInChain[i].y*ofGetWidth();
+	//	Foreground_map[index] = true;
+	//}
+	cout<<"--Finished the 2nd map of foreground objects"<<endl;
 }
 
 
@@ -303,26 +235,32 @@ void ParticleGroups::DrawAll(ofImage* m_canvas)
 	{
 		if(particle[i].Is_released)
 		{
-			//ofEnableAlphaBlending();
-			for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			if(!Is_Foreground && OutOfForeground(particle[i])|| Is_Foreground)	// if the background particles move inside foreground area, do not draw
 			{
-				for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+				for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
 				{
-					//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
-					int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
-					if(index>=0 && index<ofGetHeight()*ofGetWidth())
-						canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+					for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+					{
+						//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+						int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+						if(index>=0 && index<ofGetHeight()*ofGetWidth())
+							canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+					}
 				}
 			}
-			//ofSetColor(particle[i].c);
-			//ofEllipse(particle[i].pos.x,particle[i].pos.y,particle[i].linewidth,particle[i].linewidth);
-			//ofDisableAlphaBlending();
+
+			// If Particle Groups need to cross with each other to have heavier tone, uncomment it.
+			//for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			//{
+			//	for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+			//	{
+			//		//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+			//		int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+			//		if(index>=0 && index<ofGetHeight()*ofGetWidth())
+			//			canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+			//	}
+			//}
 		}
-		//else if(Is_open)
-		//{
-		//	ofSetColor(255);
-		//	ofEllipse(particle[i].pos.x,particle[i].pos.y,particle[i].linewidth,particle[i].linewidth);
-		//}
 	}
 }
 
@@ -336,18 +274,7 @@ void ParticleGroups::Simulate(SpacingMap m_spacing, ofImage* m_canvas)
 	if(!canstop)
 	{
 				//int par = FindPar(884,802).id;
-		//		//int parid = grid.findpar(272);
-		//for(int i = 0; i<ofGetWidth();i++)
-		//{
-		//	for(int j =0; j<ofGetHeight();j++)
-		//	{
-		//		if(OpenArea_map[i+j*ofGetWidth()])
-		//		{
-		//			ofSetColor(0,255,0);
-		//			ofEllipse(i,j,2,2);
-		//		}
-		//	}
-		//}
+				//int parid = grid.findpar(272);
 		BoundaryControl();
 		Birth_Death(m_spacing);
 		GridsCollisionKill();
@@ -361,11 +288,11 @@ void ParticleGroups::Simulate(SpacingMap m_spacing, ofImage* m_canvas)
 			indexPar = indexPar->next;		// let the index pointer point to the next one
 			TiltUpdate(&particle[thisparID]);	
 			particle[thisparID].Update();	// update position, speed
-			particle[thisparID].PushBackOrFwd(head_par, rear_par,Is_open);
+			particle[thisparID].PushBackOrFwd(head_par, rear_par,Is_Foreground);
 			if(!particle[thisparID].Is_dying)
 			{
 				particle[thisparID].advance();	// add random factors to direction
-				particle[thisparID].Move2Middle(Is_open,head_par,rear_par);	// coordinate movement
+				particle[thisparID].Move2Middle(Is_Foreground,head_par,rear_par);	// coordinate movement
 				TiltControl(&particle[thisparID]);
 			}
 			iter++;
@@ -475,9 +402,9 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 			}
 		}
 		endpointA = endpointA->next;// move the Apointer to the next par
-		if(!Is_open && !(endpointA->id==head_par && endpointA->prev->id==rear_par))
+		if(!Is_Foreground && !(endpointA->id==head_par && endpointA->prev->id==rear_par))
 			continueLoop = true;	// for the contour area case
-		else if(Is_open && endpointA->id!=rear_par)
+		else if(Is_Foreground && endpointA->id!=rear_par)
 			continueLoop = true;
 		else
 			continueLoop = false;
@@ -527,7 +454,7 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	particle[numpt].Is_newborn = true;
 	if(particle[numpt].pos.x < 0 || particle[numpt].pos.x >= ofGetWidth() || particle[numpt].pos.y <0 || particle[numpt].pos.y >= ofGetHeight())
 		particle[numpt].Is_released = false;
-	else if(Is_open && OutOfOpenArea(particle[numpt]))	// check for open area
+	else if(Is_Foreground && OutOfForeground(particle[numpt]))	// check for open area
 		particle[numpt].Is_released = false;
 	else
 		particle[numpt].Is_released = true;
@@ -606,8 +533,8 @@ void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 //---------------------------------------------
 void ParticleGroups::BoundaryControl()
 {
-	if(Is_open)
-		BoundaryControl_OpenArea();
+	if(Is_Foreground)
+		BoundaryControl_Foreground();
 	else
 		BoundaryControl_Window();
 }
@@ -619,9 +546,9 @@ void ParticleGroups::BoundaryControl()
 // Check if particles move outside of the open area
 //
 //--------------------------------------------------
-void ParticleGroups::BoundaryControl_OpenArea()
+void ParticleGroups::BoundaryControl_Foreground()
 {
-	if(Is_open)
+	if(Is_Foreground)
 	{
 		Particle* indexPar = &particle[head_par];
 		int iter = 0;
@@ -631,7 +558,7 @@ void ParticleGroups::BoundaryControl_OpenArea()
 			indexPar = indexPar->next;
 			// if this par moves out of open areas, do not kill, instead make them move in backstage
 			// delete it from grids
-			if(OutOfOpenArea(particle[indexID]))
+			if(OutOfForeground(particle[indexID]))
 			{
 				if(particle[indexID].Is_released)
 				{
@@ -664,12 +591,12 @@ void ParticleGroups::BoundaryControl_OpenArea()
 }
 
 
-bool ParticleGroups::OutOfOpenArea(Particle thispar)
+bool ParticleGroups::OutOfForeground(Particle thispar)
 {
 	if(thispar.OutOfBoudaryKill()) return true;
 	// find the par in OpenArea_map
 	int index = floor(thispar.pos.x+0.5)+floor(thispar.pos.y+0.5)*ofGetWidth();
-	if(OpenArea_map[index])
+	if(Foreground_map[index])
 		return false;	// current position is inside the open area
 	else
 		return true;
@@ -682,7 +609,7 @@ bool ParticleGroups::OutOfOpenArea(Particle thispar)
 //---------------------------------------------
 void ParticleGroups::BoundaryControl_Window()
 {
-	if(!Is_open)
+	if(!Is_Foreground)
 	{
 		Particle* indexPar = &particle[head_par];
 		int iter = 0;
@@ -735,29 +662,11 @@ bool ParticleGroups::CanStop()
 		have_active_pars = have_active_pars || particle[i].Is_released;
 		if(have_active_pars)	// if there is any alive particle
 			return false;
-		else if(Is_open && !particle[i].OutOfBoudaryKill())		// else if there is no alive particle but some of them are still inside the window
+		else if(Is_Foreground && !particle[i].OutOfBoudaryKill())		// else if there is no alive particle but some of them are still inside the window
 			return false;
 	}
 	canstop = true;
 	return true;
-
-	
-	//if(!Is_open)
-	//{
-	//	// no activated pars, can stop now
-	//	canstop = true;
-	//	return true;
-	//}
-	//else if(Is_open)
-	//{
-	//	for(int i=0; i<numpt; i++)
-	//	{
-	//		if(!particle[i].OutOfBoudaryKill())	// for the open area mode, if there is any par that is still inside the window,
-	//			return false;					// do not stop.
-	//	}
-	//	canstop = true;
-	//	return true;
-	//}
 }
 
 
@@ -925,9 +834,9 @@ void ParticleGroups::GridsCollisionKill()
 							////cout<<"kill collision particle "<<collisionID<<" between "<<particle[collisionID].prev->id<<" and "<<particle[collisionID].next->id<<endl; 
 							if(collisionID != particle[i].id)	// do not kill it self now, in case of double kill
 							{
-								if(!Is_open)
+								if(!Is_Foreground)
 									kill(collisionID);	// kill the par in particle group and erase from grid
-								else if(Is_open && collisionID!=head_par && collisionID!=rear_par)
+								else if(Is_Foreground && collisionID!=head_par && collisionID!=rear_par)
 									kill(collisionID); // In an open-area case, do not kill head par and rear par
 							}
 						}
@@ -935,12 +844,12 @@ void ParticleGroups::GridsCollisionKill()
 					// kill itself also
 					if(particle[i].Is_released)
 					{
-						if(!Is_open)
+						if(!Is_Foreground)
 						{
 							////cout<<"kill "<<particle[i].id<<" itself in contour"<<endl;
 							kill(particle[i].id);
 						}
-						else if(Is_open && i!=head_par && i!=rear_par)
+						else if(Is_Foreground && i!=head_par && i!=rear_par)
 						{
 							////cout<<"kill "<<particle[i].id<<" itself in open area"<<endl;
 							kill(particle[i].id);

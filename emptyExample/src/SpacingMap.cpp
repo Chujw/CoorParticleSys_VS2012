@@ -6,15 +6,6 @@ void SpacingMap::PixelSpaceViables(float* grayscale_pixels, float min, float max
 	height = ofGetHeight();
 	width = ofGetWidth();
 	spaceViables_map = new float [height*width];
-	//for(int y = 0; y<height; y++)
-	//{
-	//	for(int x = 0; x<width/3; x++)
-	//		spaceViables_map[y*width+x] = LEFT_VIABLE;
-	//	for(int x = width/3; x<2*width/3; x++)
-	//		spaceViables_map[y*width+x] = MID_VIABLE;
-	//	for(int x = 2*width/3; x<width; x++)
-	//		spaceViables_map[y*width+x] = RIGHT_VIABLE;
-	//}
 	for(int y = 0; y<ofGetHeight(); y++)
 	{
 		for(int x=0; x<ofGetWidth(); x++)
@@ -30,11 +21,6 @@ void SpacingMap::PixelSpaceViables(float* grayscale_pixels, float min, float max
 	}
 
 }
-
-//void SpacingMap::RescaleGrayValues(float* grayscale_pixels, float min, float max)
-//{
-//
-//}
 
 void SpacingMap::PixelThresholds()	
 {

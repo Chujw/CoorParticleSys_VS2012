@@ -32,7 +32,7 @@ private:
 	int id;
 	//ofVec2f* close_edgechain;
 	ofVec2f* bkg_edgechain;
-	ofVec2f* open_edgechain;
+	ofVec2f* forg_edgechain;
 	ofVec2f* AllPixelsInChain;
 	float* grayscale_pixels;
 	ofVec2f start_edgepx;
@@ -57,7 +57,7 @@ public:
 	void SetupGrayValue();
 	float* GetGrayscaleMap();
 	int FindChainPoint(ofVec2f thispos);
-	ofVec2f* GetOpenEdgeChain();
+	ofVec2f* GetForgEdgeChain();
 	ofImage GetsrcImage();
 	ofImage GetEdgeMap();
 	ofVec2f* GetAllPixelsInChain(int* allpixels_num);

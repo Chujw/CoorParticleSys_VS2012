@@ -65,29 +65,14 @@ void Particle::advance()
 
 void Particle::Move2Middle(bool IsOpenMode, int head_par, int rear_par)
 {
-	/*if(this->beacon_id == 203)
-		;*/
-	/*if(this->id == 16)
-		cout<<"found"<<endl;*/
-
 	//-------------------------------------
 	// Calculate the sigmoid bearing
 	//-------------------------------------
 	float d_sigmoid = GetSigmoidBearing(IsOpenMode, head_par, rear_par, this);
-					//	Particle testpar;
-					//testpar.bearing = radians(270);
-					//	testpar.bearing_vec = ofVec2f(sin(testpar.bearing),cos(testpar.bearing));
-					//	/*if(testpar.bearing_vec.x<0)
-					//		testpar.bearing = 2*PI-testpar.bearing;*/
-					//	testpar.angle = degrees(testpar.bearing);
 	//-------------------------------------
 	// Calculate the average bearing
 	//-------------------------------------
 	float d_aver = GetAverageBearing(IsOpenMode, head_par, rear_par, this);
-
-			float test_avedeg = degrees(d_aver);
-			float test_sigdeg = degrees(d_sigmoid);
-			float test_degtobeadded = degrees(d_aver + d_sigmoid);
 	//---------------------------------------
 	// Add the new bearing to the old one
 	//---------------------------------------
@@ -103,20 +88,6 @@ void Particle::Move2Middle(bool IsOpenMode, int head_par, int rear_par)
 			float deg_sig_temp = degrees(this->bearing);
 			ofVec2f test_bearing_vec = ofVec2f(sin(this->bearing),cos(this->bearing));
 			deg_sig_temp = degrees(this->bearing);		
-	//if(this->beacon_id == 203)
-	//{
-	//	ofSetColor(0,0,255);
-	//	ofEllipse(this->next->pos.x,this->next->pos.y,5,5);	// blue C
-	//	ofSetColor(255,255,255);
-	//	ofEllipse(this->pos.x,this->pos.y,5,5);			// white B
-	//	ofSetColor(0,255,255);
-	//	ofEllipse(this->prev->pos.x,this->prev->pos.y,5,5);	// light blue A
-	//}
-	//if(this->beacon_id == 153)
-	//{
-	//	ofSetColor(200,0,255);
-	//	ofEllipse(this->prev->pos.x,this->prev->pos.y,9,9);	// purple A'prev
-	//}
 }
 
 //------------------------------------------------------------
@@ -172,7 +143,6 @@ float Particle::GetSigmoidBearing(bool IsOpenMode, int head_par, int rear_par, P
 	float mid = (AB+BC)/2;
 	float ratio = AB/mid;
 	ratio = floorf(ratio * 100) / 100;	// round down to two decimal places
-				float deg_sig;
 
 	//----------------------------------------------------------------
 	if(ratio<1.0)			// tangent-like shape (move to right)
@@ -181,10 +151,8 @@ float Particle::GetSigmoidBearing(bool IsOpenMode, int head_par, int rear_par, P
 		x = floorf(x * 100) / 100;
 		float slope = 1/(cos(x)*cos(x)); // sec square
 		d_sigmoid = atan2(1,slope);
-					deg_sig = degrees(d_sigmoid);
 		if(d_sigmoid>0)
 			d_sigmoid = -d_sigmoid;
-					deg_sig = degrees(d_sigmoid);
 	}
 	else if(ratio>1.0)			// inverse-tangent-like (move to left)
 	{
@@ -194,10 +162,8 @@ float Particle::GetSigmoidBearing(bool IsOpenMode, int head_par, int rear_par, P
 		x = floorf(x * 100) / 100;
 		float slope = 1/(cos(x)*cos(x)); // sec square
 		d_sigmoid = atan2(-1,slope);
-				deg_sig = degrees(d_sigmoid);
 		if(d_sigmoid<0)
 			d_sigmoid = -d_sigmoid;
-					deg_sig = degrees(d_sigmoid);
 	}
 	if(!Is_headpar && !Is_rearpar)	// for regular pars, the sigmoid direction is done computing now
 		return d_sigmoid;
