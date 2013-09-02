@@ -273,8 +273,6 @@ void ParticleGroups::Simulate(SpacingMap m_spacing, ofImage* m_canvas)
 {
 	if(!canstop)
 	{
-				//int par = FindPar(884,802).id;
-				//int parid = grid.findpar(272);
 		BoundaryControl();
 		Birth_Death(m_spacing);
 		GridsCollisionKill();
@@ -370,21 +368,15 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 			endpointA->UpdateSpacingTd(Apixel_threshold);// update its last_spacing_threshold
 			aver_threshold = 0.5 * (endpointA->last_spacing_threshold + endpointB->last_spacing_threshold);	// update the average threshold
 			float AB = distAB(endpointA,endpointB);
-						//float dth_dist = DTH_OFFSET*aver_threshold;
-						//float bth_dist = BRH_OFFSET*aver_threshold;
 			if(AB<DTH_OFFSET*aver_threshold && (endpointA->Is_dying == endpointB->Is_dying))	
 			{	// death
 				if(!endpointA->Is_dying)	// mark them as dying...
 				{
 					endpointA->Is_dying = true;
-					////cout<<endpointA->id<<" is dying..."<<endl;
-					//endpointA->bearing = (endpointA->bearing + endpointB->bearing)/2;
 				}
 				if(!endpointB->Is_dying)
 				{
 					endpointB->Is_dying = true;
-					////cout<<endpointB->id<<" is dying..."<<endl;
-					//endpointB->bearing = -endpointA->bearing;
 				}
 				if(tempA.id == numpt-1)	// if A is the last one (A will be deleted)
 				{
@@ -433,10 +425,8 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	particle[numpt].bearing_vec = (endpointA->bearing_vec + endpointB->bearing_vec)/2;	// the new direction is the average one
 	particle[numpt].bearing_vec.normalize();
 	particle[numpt].bearing = acos(particle[numpt].bearing_vec.dot(ofVec2f(0,1)));
-				float testangle = degrees(particle[numpt].bearing);
 	if(particle[numpt].bearing_vec.x<0)
 		particle[numpt].bearing = 2*PI-particle[numpt].bearing;
-					testangle = degrees(particle[numpt].bearing);
 	particle[numpt].angle = degrees(particle[numpt].bearing);
 					
 	//----------------------------------------------------------------------------------
@@ -482,7 +472,6 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 		particle[numpt].linewidth = particle[numpt].UpdateLineWidth((endpointA->linewidth + endpointB->linewidth)/2,MIN_SP_VIABLE,MAX_SP_VIABLE);
 	}
 		// insert this particle into the grid
-	////cout<<"release a new particle "<<numpt<<" between "<<endpointA->id<<" and "<<endpointB->id<<endl;
 	if(FillGrids)
 		grid.insertPar(&particle[numpt]);
 	numpt++;
@@ -506,22 +495,10 @@ void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 	if(endpointA->bearing_vec.x<0)
 		endpointA->bearing = 2*PI-endpointA->bearing;
 	endpointA->angle = degrees(endpointA->bearing);
-			
-			//if(Is_open)
-			//{
-			//	// Make A point to the default direction for open area
-			//	endpointA->bearing = radians(DIRECTION_OPEN_AREA);
-			//	endpointA->bearing_vec = ofVec2f(sin(endpointA->bearing),cos(endpointA->bearing));
-			//	endpointA->angle = DIRECTION_OPEN_AREA;
-			//}
-
 	endpointA->speed = DEFAULT_SPEED;
-	////cout<<"past info to kill particle "<<endpointB->id<<endl;
 	kill(endpointB->id);
 	endpointA->Is_dying = false;
 	endpointB->Is_dying = false;
-	////cout<<"...both "<<endpointA->id<<" and "<<endpointB->id<<" are back to normal."<<endl;
-	////cout<<endl;
 }
 
 
@@ -566,11 +543,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 					particle[indexID].Is_released = false;	// if false, don't draw it, just deactive the birth and death
 				}
 				if(FillGrids && particle[indexID].Was_released &&!particle[indexID].Is_released)// if the par just moves out of the open area
-				{
-					////cout<<"Out of open area, delete "<<indexID<<" in grid "<<endl;
 					grid.deletePar(&particle[indexID]);// delete it from the quadtree
-					////cout<<endl;
-				}
 			}
 			// if the particle moves back to open area
 			// set it as released again and insert it back to grid again
@@ -624,11 +597,7 @@ void ParticleGroups::BoundaryControl_Window()
 				particle[indexID].Was_released = particle[indexID].Is_released;
 				particle[indexID].Is_released = false;	// if false, don't draw it, just deactive the birth and death
 				if(FillGrids && particle[indexID].Was_released &&!particle[indexID].Is_released)
-				{
-					////cout<<"Out of boundary, delete "<<indexID<<" in grid "<<endl;
 					grid.deletePar(&particle[indexID]);// delete it from the quadtree
-					////cout<<endl;
-				}
 			}
 			// if the particle moves back to screen
 			// set it as released again and insert it back to grid again
@@ -684,10 +653,8 @@ bool ParticleGroups::GetStopSignal()
 void ParticleGroups::kill(int indexID)
 {
 	// break the link for this slot
-		//cout<<"The link was: "<<particle[indexID].prev->id<<"--"<<particle[indexID].prev->next->id<<"--"<<particle[indexID].prev ->next->next->id<<endl;
 	particle[indexID].prev->next = particle[indexID].next;
 	particle[indexID].next->prev = particle[indexID].prev;
-		//cout<<"Now it is:    "<<particle[indexID].prev->id<<"--"<<particle[indexID].prev->next->id<<"--"<<particle[indexID].prev ->next->next->id<<endl;
 	Particle tempKilledPar = particle[indexID];	// a temporary particle to pass to grid to delete
 	
 	if(particle[numpt-1].id != indexID)	// if it is not a last particle (memory location) to be killed
@@ -702,22 +669,15 @@ void ParticleGroups::kill(int indexID)
 			head_par = particle[indexID].next->id;
 		
 		// copy the last one to this slot
-		//if(particle[numpt-1].prev->child == numpt-1)
-		//	particle[numpt-1].prev->child = indexID;
 		particle[indexID] = particle[numpt-1];
 		particle[indexID].id = indexID;
-		////cout<<"Need to kill "<<indexID<<", kill "<<numpt-1<<" instead"<<endl;
-		////cout<<"copy the last one "<<numpt-1<<" to "<<indexID<<endl;
 		// relink the last one's pointers
-				//cout<<"The link was: "<<particle[numpt-1].prev->id<<"--"<<particle[numpt-1].prev->next->id<<"--"<<particle[numpt-1].prev ->next->next->id<<endl;
 		particle[numpt-1].next->prev = &particle[indexID];
 		particle[numpt-1].prev->next = &particle[indexID];
 		if(rear_par == numpt-1)	
 			rear_par = indexID;
 		if(head_par == numpt-1)
 			head_par = indexID;
-				//cout<<"Now it is:    "<<particle[numpt-1].prev->id<<"--"<<particle[numpt-1].prev->next->id<<"--"<<particle[numpt-1].prev ->next->next->id<<endl;
-
 	}
 	
 	else // the one that should be killed is a last particle (memory location)
@@ -732,19 +692,15 @@ void ParticleGroups::kill(int indexID)
 
 	// delete the last one
 	particle[numpt-1] = NULL;	// killed it
-	////cout<<"Just killed particle "<<numpt-1<<" ("<<indexID<<")"<<endl;
 
 	// update the ids in the grids
 	if(FillGrids)
 	{
-		//quad.deletePar(indexID);
-		//quad.idUpdate(numpt-1,particle[indexID]);
 		grid.deletePar(&tempKilledPar);	// delete the particle that was supose to be killed
 		grid.idUpdate(numpt-1,particle[indexID]);	// update the last particle's id in the grid
 	}
 	numpt--;
 	cout<<"numpt: "<<numpt<<"; beacon_num: "<<beacon_num<<endl;
-	////cout<<endl;
 } 
 
 //---------------------------------------------
@@ -756,9 +712,7 @@ void ParticleGroups::SetAsRegular(Particle* A, Particle* B, float birth_dist)
 {
 	float AB = distAB(A,B);
 	if(B->Is_newborn && distAB(A,B)>=(birth_dist/2))		// if larger than the birth_dist, set the new born ones as regular ones 
-	{
 		B->Is_newborn = false;
-	}
 }
 
 //---------------------------------------------
@@ -768,14 +722,12 @@ void ParticleGroups::SetAsRegular(Particle* A, Particle* B, float birth_dist)
 //---------------------------------------------
 void ParticleGroups::CreateGrids()
 {
-	//quad = new Quadtree quad(0,RectBound(0,0,ofGetWidth(),ofGetHeight());
 	grid.cleargrid();
 	if(numpt!=0)
 	{
 		for(int i = 0; i<numpt; i++)
 		{
 			if(particle[i].Is_released)
-				//quad.insert(particle[i]);
 				if(!grid.insertPar(&particle[i]))
 					cout<<"Warning: Cannot insert particle "<<particle[i].id<<" when initializing the grids"<<endl;
 		}
@@ -797,7 +749,6 @@ void ParticleGroups::UpdateGrids()
 		{
 			grid.UpdatePar(&particle[i]);
 		}
-		//cout<<endl;
 	}
 }
 
@@ -831,7 +782,6 @@ void ParticleGroups::GridsCollisionKill()
 						int collisionID = parlist[index].id;
 						if(particle[collisionID].Is_released)	// in case some pars in the list has been killed already
 						{
-							////cout<<"kill collision particle "<<collisionID<<" between "<<particle[collisionID].prev->id<<" and "<<particle[collisionID].next->id<<endl; 
 							if(collisionID != particle[i].id)	// do not kill it self now, in case of double kill
 							{
 								if(!Is_Foreground)
@@ -845,20 +795,13 @@ void ParticleGroups::GridsCollisionKill()
 					if(particle[i].Is_released)
 					{
 						if(!Is_Foreground)
-						{
-							////cout<<"kill "<<particle[i].id<<" itself in contour"<<endl;
 							kill(particle[i].id);
-						}
 						else if(Is_Foreground && i!=head_par && i!=rear_par)
-						{
-							////cout<<"kill "<<particle[i].id<<" itself in open area"<<endl;
 							kill(particle[i].id);
-						}
 					}
 				}
 			}
 		}
-		
 	}
 }
 
