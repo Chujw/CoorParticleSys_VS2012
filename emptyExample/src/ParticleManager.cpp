@@ -98,7 +98,7 @@ void ParticleManager::Simulate(ofImage* canvas)
 			{
 			ofImage saveimage;
 			saveimage.clone(*canvas);
-			saveimage.saveImage("2ndGroup.png");
+			saveimage.saveImage("1stGroup.png");
 			Saved1stGroup = true;
 			}
 			parGroup[0].Simulate(m_spacing, canvas);

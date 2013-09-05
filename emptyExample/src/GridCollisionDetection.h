@@ -3,7 +3,7 @@
 #include "ofMain.h"
 #include "Particle.h"
 
-#define		REG_MAX_PARTICLES	5
+#define		REG_MAX_PARTICLES	10
 #define		GRID_ROW			100
 #define		GRID_COL			100
 #define		COLLISION_KILL_DIST		3
