@@ -8,6 +8,7 @@ void ParticleManager::Setup(ofImage* edgeImage, ofImage* srcImage)
 	num_group = 0;
 	Mngr_canstop = false;
 	FillObjects = false;
+	Saved1stGroup = false;
 	parGroup.resize(GROUP_NUM*2);
 	edgemap.resize(GROUP_NUM*2);
 	for(int i=0; i<GROUP_NUM; i++)
@@ -66,13 +67,13 @@ void ParticleManager::CreateEdgeChain()
 		parGroup[1].Setup_parlist_forg(m_lineEdgechain,linepar_numpt,m_spacing);	
 		parGroup[1].Setup_Foreground_map(AllPixelsInChain, allpixels_num);
 	}
-	//----------------------------------------------------
-	// Make a third group with different directions
-	//----------------------------------------------------
-	edgemap[num_map].MakeOpenEdgeChainsFromThreadEdge(SECOND_EDGE_START,SECOND_EDGE_END,&second_linepar_numpt,m_spacing.GetDefaultSpacing());
-	m_lineEdgechain = edgemap[num_map].GetForgEdgeChain();
-	parGroup[2].Setup_parlist_forg(m_lineEdgechain,second_linepar_numpt,m_spacing);	
-	parGroup[2].Setup_2ndForeground_map(AllPixelsInChain, allpixels_num);
+	////----------------------------------------------------
+	//// Make a third group with different directions
+	////----------------------------------------------------
+	//edgemap[num_map].MakeOpenEdgeChainsFromThreadEdge(SECOND_EDGE_START,SECOND_EDGE_END,&second_linepar_numpt,m_spacing.GetDefaultSpacing());
+	//m_lineEdgechain = edgemap[num_map].GetForgEdgeChain();
+	//parGroup[2].Setup_parlist_forg(m_lineEdgechain,second_linepar_numpt,m_spacing);	
+	//parGroup[2].Setup_2ndForeground_map(AllPixelsInChain, allpixels_num);
 }
 
 //---------------------------------------------
@@ -88,11 +89,20 @@ void ParticleManager::Simulate(ofImage* canvas)
 		//if(!parGroup[2].GetStopSignal())
 		//	parGroup[2].Simulate(m_spacing, canvas);
 		
-		if(!parGroup[0].GetStopSignal())
-			parGroup[0].Simulate(m_spacing, canvas);
-
-		else if(!parGroup[1].GetStopSignal())
+		if(!parGroup[1].GetStopSignal())
 			parGroup[1].Simulate(m_spacing, canvas);
+
+		else if(!parGroup[0].GetStopSignal())
+		{
+			if(!Saved1stGroup)
+			{
+			ofImage saveimage;
+			saveimage.clone(*canvas);
+			saveimage.saveImage("2ndGroup.png");
+			Saved1stGroup = true;
+			}
+			parGroup[0].Simulate(m_spacing, canvas);
+		}
 		else
 		{
 			Mngr_canstop = true;

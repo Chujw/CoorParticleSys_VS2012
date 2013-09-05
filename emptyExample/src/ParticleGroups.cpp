@@ -168,7 +168,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("3GrpPanda.jpg");
+	testImage.loadImage("lion_thresh66.jpg");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -196,7 +196,7 @@ void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixe
 void ParticleGroups::Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("3GrpPanda.jpg");
+	testImage.loadImage("lion.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -235,31 +235,32 @@ void ParticleGroups::DrawAll(ofImage* m_canvas)
 	{
 		if(particle[i].Is_released)
 		{
-			if(!Is_Foreground && OutOfForeground(particle[i])|| Is_Foreground)	// if the background particles move inside foreground area, do not draw
-			{
-				for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
-				{
-					for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
-					{
-						//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
-						int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
-						if(index>=0 && index<ofGetHeight()*ofGetWidth())
-							canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
-					}
-				}
-			}
-
-			// If Particle Groups need to cross with each other to have heavier tone, uncomment it.
-			//for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			//// If we want Particle Groups not crossing with each other, uncomment it.
+			//if(!Is_Foreground && OutOfForeground(particle[i])|| Is_Foreground)	// if the background particles move inside foreground area, do not draw
 			//{
-			//	for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+			//	for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
 			//	{
-			//		//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
-			//		int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
-			//		if(index>=0 && index<ofGetHeight()*ofGetWidth())
-			//			canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+			//		for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+			//		{
+			//			//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+			//			int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+			//			if(index>=0 && index<ofGetHeight()*ofGetWidth())
+			//				canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+			//		}
 			//	}
 			//}
+
+			//If Particle Groups need to cross with each other to have heavier tone, uncomment it.
+			for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			{
+				for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+				{
+					//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+					int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+					if(index>=0 && index<ofGetHeight()*ofGetWidth())
+						canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+				}
+			}
 		}
 	}
 }

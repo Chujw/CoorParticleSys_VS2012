@@ -23,7 +23,7 @@ void EdgeMap::InitEdgeMap(int this_id)
 //-----------------------------------------------------------------
 void EdgeMap::MakeImages()
 {
-	canvas.loadImage("Panda.jpg");
+	canvas.loadImage("lion.png");
 	canvas.resize(ofGetWidth(), ofGetHeight());
 	canvas.setImageType(OF_IMAGE_GRAYSCALE);
 	SetupGrayValue();	// store the gray value of each pixel

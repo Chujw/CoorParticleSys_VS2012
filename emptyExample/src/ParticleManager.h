@@ -4,7 +4,7 @@
 #include "SpacingMap.h"
 
 
-#define GROUP_NUM			3
+#define GROUP_NUM			2
 #define XD					ofGetWidth()
 #define YD					ofGetHeight()
 #define LEYE_RADIUS			YD/6
@@ -17,8 +17,8 @@
 #define SECOND_EDGE_START		ofVec2f(1100,363)
 #define SECOND_EDGE_END		ofVec2f(-100,-453)
 
-#define BKG_START		ofVec2f(1,-YD/10)
-#define BKG_END			ofVec2f(1,YD+YD/10)
+#define BKG_START		ofVec2f(1,-YD/5)
+#define BKG_END			ofVec2f(1,YD+YD/5)
 
 class ParticleManager{
 private:
@@ -33,6 +33,7 @@ private:
 	int num_group;
 	int num_map;
 	bool FillObjects;
+	bool Saved1stGroup;
 	//ofImage edgeImage_buf;
 	SpacingMap m_spacing;
 public:
