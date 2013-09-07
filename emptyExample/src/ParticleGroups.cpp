@@ -168,7 +168,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("starrynight_thresh.jpg");
+	testImage.loadImage("HarryPotter_threshold.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -414,8 +414,8 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 //---------------------------------------------
 void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap m_spacing)
 {
-	if(numpt==CHAIN_NUM-1)
-		cout<<"Warning: numpt is "<<numpt<<" now."<<endl;
+	//if(numpt==CHAIN_NUM-1)
+	//	cout<<"Warning: numpt is "<<numpt<<" now."<<endl;
 	particle[numpt].pos = endpointA->pos;	// create from the A's position
 	particle[numpt].last_pos = particle[numpt].pos;
 	particle[numpt].id = numpt;
@@ -701,7 +701,7 @@ void ParticleGroups::kill(int indexID)
 		grid.idUpdate(numpt-1,particle[indexID]);	// update the last particle's id in the grid
 	}
 	numpt--;
-	cout<<"numpt: "<<numpt<<"; beacon_num: "<<beacon_num<<endl;
+	////cout<<"numpt: "<<numpt<<"; beacon_num: "<<beacon_num<<endl;
 } 
 
 //---------------------------------------------

@@ -11,8 +11,8 @@
 #define LEYE_CENTER			ofVec2f(XD/4, YD/3)
 #define LEYE_START_POINT	ofVec2f(XD/4-LEYE_RADIUS, YD/3)
 
-#define EDGE_START		ofVec2f(-XD/10,YD-1)
-#define	EDGE_END		ofVec2f(XD+XD/10,YD-1)
+#define EDGE_START		ofVec2f(-XD/5,YD-1)
+#define	EDGE_END		ofVec2f(XD+XD/5,YD-1)
 
 #define SECOND_EDGE_START		ofVec2f(1100,363)
 #define SECOND_EDGE_END		ofVec2f(-100,-453)

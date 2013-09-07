@@ -154,8 +154,8 @@ bool GridCollisionDetection::insertPar(Particle* thispar)
 		if(index>=0 && index < grids.size())
 		{
 			////cout<<"Insert particle "<<thispar->id<<" in grid "<<index<<endl;
-			if(grids[index].grid_pars.size() == grids[index].grid_pars.capacity()-1)
-				cout<<"the grid's number of particles reached the max..."<<endl;
+			////if(grids[index].grid_pars.size() == grids[index].grid_pars.capacity()-1)
+			////	cout<<"the grid's number of particles reached the max..."<<endl;
 			if(grids[index].grid_pars.empty() || grids[index].grid_pars.size() == grids[index].grid_pars.capacity()-1)
 				grids[index].grid_pars.reserve(REG_MAX_PARTICLES+grids[index].grid_pars.capacity());
 			grids[index].grid_pars.push_back(*thispar);

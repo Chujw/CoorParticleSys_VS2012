@@ -7,7 +7,7 @@
 //#define NUM 3
 #define DEFAULT_SPEED		0.5 
 #define DEFAULT_LINEWIDTH	1
-#define LINEMAX		5
+#define LINEMAX		10
 #define	LINEMIN		0
 //#define	BEARING_LIMIT	
 
