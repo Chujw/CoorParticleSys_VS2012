@@ -235,9 +235,6 @@ bool Particle::PushBackOrFwd(int head, int rear, bool IsOpenMode)
 void Particle::Update()
 {
 	last_pos = pos;
-	float sinbear =  sin(bearing);
-	float cosbear =  cos(bearing);
-
 	pos.x += 0.1 * speed * sin(bearing);
 	pos.y += 0.1 * speed * cos(bearing);
 }
