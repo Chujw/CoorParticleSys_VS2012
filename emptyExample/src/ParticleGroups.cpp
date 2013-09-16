@@ -168,7 +168,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("HarryPotter_threshold.png");
+	testImage.loadImage("chair_threshold.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -395,9 +395,10 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 			}
 		}
 		endpointA = endpointA->next;// move the Apointer to the next par
-		if(!Is_Foreground && !(endpointA->id==head_par && endpointA->prev->id==rear_par))
-			continueLoop = true;	// for the contour area case
-		else if(Is_Foreground && endpointA->id!=rear_par)
+		//if(!Is_Foreground && !(endpointA->id==head_par && endpointA->prev->id==rear_par))
+		//	continueLoop = true;	// for the contour area case
+		//else 
+		if(/*Is_Foreground &&*/endpointA->id!=rear_par)
 			continueLoop = true;
 		else
 			continueLoop = false;

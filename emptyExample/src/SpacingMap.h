@@ -7,7 +7,7 @@
 //#define		MID_VIABLE	1
 //#define		RIGHT_VIABLE		1
 #define		MIN_SP_VIABLE	1
-#define		MAX_SP_VIABLE	9
+#define		MAX_SP_VIABLE	5
 
 
 

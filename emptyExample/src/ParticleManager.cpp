@@ -104,8 +104,7 @@ void ParticleManager::Simulate(ofImage* canvas)
 			parGroup[1].Simulate(m_spacing, canvas);
 		}
 		else
-		{
-			Mngr_canstop = true;
+		{	Mngr_canstop = true;
 			ofImage saveimage;
 			saveimage.clone(*canvas);
 			saveimage.saveImage("FinalResult.png");
