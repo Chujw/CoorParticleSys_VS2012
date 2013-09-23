@@ -168,7 +168,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("chair_threshold.png");
+	testImage.loadImage("heart_threshold.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -178,25 +178,25 @@ void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixe
 	{
 		for(int j = 0; j<ofGetHeight(); j++)
 		{
-			if(testedgepixel[i+j*ofGetWidth()] ==0)
+			if(testedgepixel[i+j*ofGetWidth()] ==255)
 				Foreground_map[i+j*ofGetWidth()] = true;
 			else // all pixels with color (not neccessary to be black) is included in the map
 				Foreground_map[i+j*ofGetWidth()] = false;
 		}
 	}
 	//make all the edge pixels as true;
-	for(int i = 0; i<allpixels_num; i++)
-	{
-		int index = AllPixelsInChain[i].x + AllPixelsInChain[i].y*ofGetWidth();
-		Foreground_map[index] = true;
-	}
-	cout<<"--Finished the map of foreground objects"<<endl;
+	//for(int i = 0; i<allpixels_num; i++)
+	//{
+	//	int index = AllPixelsInChain[i].x + AllPixelsInChain[i].y*ofGetWidth();
+	//	Foreground_map[index] = true;
+	//}
+	cout<<"--Finished the 1st map of foreground objects"<<endl;
 }
 
 void ParticleGroups::Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("lion.png");
+	testImage.loadImage("heart_threshold.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -221,7 +221,33 @@ void ParticleGroups::Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allp
 	cout<<"--Finished the 2nd map of foreground objects"<<endl;
 }
 
+void ParticleGroups::Setup_Bkground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
+{
+	ofImage testImage;
+	testImage.loadImage("heart_threshold.png");
+	testImage.resize(ofGetWidth(),ofGetHeight());
+	testImage.setImageType(OF_IMAGE_GRAYSCALE);
+	unsigned char* testedgepixel = testImage.getPixels();
 
+	Foreground_map = new bool[ofGetWidth()*ofGetHeight()];
+	for(int i =0; i<ofGetWidth(); i++)
+	{
+		for(int j = 0; j<ofGetHeight(); j++)
+		{
+			if(testedgepixel[i+j*ofGetWidth()] ==0)
+				Foreground_map[i+j*ofGetWidth()] = true;
+			else // all pixels with color (not neccessary to be black) is included in the map
+				Foreground_map[i+j*ofGetWidth()] = false;
+		}
+	}
+	//make all the edge pixels as true;
+	//for(int i = 0; i<allpixels_num; i++)
+	//{
+	//	int index = AllPixelsInChain[i].x + AllPixelsInChain[i].y*ofGetWidth();
+	//	Foreground_map[index] = true;
+	//}
+	cout<<"--Finished the bkg map of background objects"<<endl;
+}
 
 //---------------------------------------------
 //
@@ -236,31 +262,31 @@ void ParticleGroups::DrawAll(ofImage* m_canvas)
 		if(particle[i].Is_released)
 		{
 			//// If we want Particle Groups not crossing with each other, uncomment it.
-			//if(!Is_Foreground && OutOfForeground(particle[i])|| Is_Foreground)	// if the background particles move inside foreground area, do not draw
-			//{
-			//	for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
-			//	{
-			//		for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
-			//		{
-			//			//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
-			//			int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
-			//			if(index>=0 && index<ofGetHeight()*ofGetWidth())
-			//				canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
-			//		}
-			//	}
-			//}
-
-			//If Particle Groups need to cross with each other to have heavier tone, uncomment it.
-			for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			if(!Is_Foreground && OutOfForeground(particle[i])|| Is_Foreground)	// if the background particles move inside foreground area, do not draw
 			{
-				for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+				for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
 				{
-					//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
-					int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
-					if(index>=0 && index<ofGetHeight()*ofGetWidth())
-						canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+					for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+					{
+						//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+						int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+						if(index>=0 && index<ofGetHeight()*ofGetWidth())
+							canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+					}
 				}
 			}
+
+			////If Particle Groups need to cross with each other to have heavier tone, uncomment it.
+			//for(float x=particle[i].pos.x; x<particle[i].pos.x+particle[i].linewidth && x<ofGetWidth(); x++)
+			//{
+			//	for(float y=particle[i].pos.y; y<particle[i].pos.y+particle[i].linewidth && y<ofGetHeight();y++)
+			//	{
+			//		//m_canvas->setColor(int(floor(x+0.5)),int(floor(y+0.5)),particle[i].c);
+			//		int index = int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth();
+			//		if(index>=0 && index<ofGetHeight()*ofGetWidth())
+			//			canvas_pixel[int(floor(x+0.5))+int(floor(y+0.5))*ofGetWidth()] = 0;
+			//	}
+			//}
 		}
 	}
 }

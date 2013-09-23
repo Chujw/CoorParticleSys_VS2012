@@ -42,7 +42,7 @@ Particle::Particle(float theta, float sp)
 void Particle::advance()
 {
 	float dtheta;
-	dtheta = ofRandom(-15,15);    // randomzie direction
+	dtheta = ofRandom(-5,5);    // randomzie direction
 	if(id != -1 && !Is_newborn && !Is_dying)	// for general particles
 	{
 		//if(dtheta*last_tilt<0)

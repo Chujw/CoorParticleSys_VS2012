@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#define		BASE_SPACING	10
+#define		BASE_SPACING	15
 //#define		MID_BASE_SPACING	20
 //#define		LEFT_VIABLE		1
 //#define		MID_VIABLE	1
