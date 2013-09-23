@@ -4,7 +4,7 @@
 #include "SpacingMap.h"
 
 
-#define GROUP_NUM			3
+#define GROUP_NUM			2
 #define XD					ofGetWidth()
 #define YD					ofGetHeight()
 #define LEYE_RADIUS			YD/6
@@ -14,8 +14,8 @@
 #define EDGE_START		ofVec2f(-XD/5,YD-1)
 #define	EDGE_END		ofVec2f(XD+XD/5,YD-1)
 
-#define SECOND_EDGE_START		ofVec2f(ofGetWidth()+200,100)
-#define SECOND_EDGE_END		ofVec2f(-100,-253)
+#define SECOND_EDGE_START		ofVec2f(1100,363)
+#define SECOND_EDGE_END		ofVec2f(-100,-453)
 
 #define BKG_START		ofVec2f(1,-YD/5)
 #define BKG_END			ofVec2f(1,YD+YD/5)

@@ -38,7 +38,6 @@ public:
 	void Setup();
 	void Setup_parlist_bkg(ofVec2f* parlist, int closepar_numpt, SpacingMap m_spacing);
 	void Setup_parlist_forg(ofVec2f* parlist,int openpar_numpt,SpacingMap m_spacing);
-	void Setup_Bkground_map(ofVec2f* AllPixelsInChain, int allpixels_num);
 	void Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num);	// setup the map of open area via parlist
 	void Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num);
 	void Simulate(SpacingMap m_spacing, ofImage* m_canvas);
