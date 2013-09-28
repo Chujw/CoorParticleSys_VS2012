@@ -6,8 +6,8 @@
 #define		BIRTH	1
 //#define NUM 3
 #define DEFAULT_SPEED		0.5 
-#define DEFAULT_LINEWIDTH	0
-#define LINEMAX		3
+#define DEFAULT_LINEWIDTH	1
+#define LINEMAX		2
 #define	LINEMIN		0
 //#define	BEARING_LIMIT	
 
