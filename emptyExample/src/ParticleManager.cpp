@@ -48,11 +48,11 @@ void ParticleManager::CreateEdgeChain()
 	// Create backgroud edge chain
 	m_bkgEdgechain = edgemap[num_map].MakeBkgEdgeChains(BKG_START,BKG_END,&bkgpar_numpt,m_spacing.GetDefaultSpacing());
 	// pass the particle distribution list to groups
-	parGroup[0].Setup_parlist_bkg(m_bkgEdgechain,bkgpar_numpt,m_spacing);	// closed contour particles list
+	parGroup[0].Setup_parlist_forg(m_bkgEdgechain,bkgpar_numpt,m_spacing);	// closed contour particles list
 	// setup the map of open areas
 	int allpixels_num = 0;
 	ofVec2f* AllPixelsInChain = edgemap[num_map].GetAllPixelsInChain(&allpixels_num);
-	parGroup[0].Setup_Foreground_map(AllPixelsInChain, allpixels_num);
+	parGroup[0].Setup_Bkground_map(AllPixelsInChain, allpixels_num);
 	//------------------------------------------------------
 	// For particles in open areas
 	//------------------------------------------------------
@@ -70,10 +70,10 @@ void ParticleManager::CreateEdgeChain()
 	////----------------------------------------------------
 	//// Make a third group with different directions
 	////----------------------------------------------------
-	//edgemap[num_map].MakeOpenEdgeChainsFromThreadEdge(SECOND_EDGE_START,SECOND_EDGE_END,&second_linepar_numpt,m_spacing.GetDefaultSpacing());
-	//m_lineEdgechain = edgemap[num_map].GetForgEdgeChain();
-	//parGroup[2].Setup_parlist_forg(m_lineEdgechain,second_linepar_numpt,m_spacing);	
-	//parGroup[2].Setup_2ndForeground_map(AllPixelsInChain, allpixels_num);
+	edgemap[num_map].MakeOpenEdgeChainsFromThreadEdge(SECOND_EDGE_START,SECOND_EDGE_END,&second_linepar_numpt,m_spacing.GetDefaultSpacing());
+	m_lineEdgechain = edgemap[num_map].GetForgEdgeChain();
+	parGroup[2].Setup_parlist_forg(m_lineEdgechain,second_linepar_numpt,m_spacing);	
+	parGroup[2].Setup_2ndForeground_map(AllPixelsInChain, allpixels_num);
 }
 
 //---------------------------------------------
@@ -85,11 +85,11 @@ void ParticleManager::Simulate(ofImage* canvas)
 {
 	if(!Mngr_canstop)
 	{
-		//// uncomment it if need a third group
-		//if(!parGroup[2].GetStopSignal())
-		//	parGroup[2].Simulate(m_spacing, canvas);
+		// uncomment it if need a third group
+		if(!parGroup[2].GetStopSignal())
+			parGroup[2].Simulate(m_spacing, canvas);
 		
-		if(!parGroup[0].GetStopSignal())
+		else if(!parGroup[0].GetStopSignal())
 			parGroup[0].Simulate(m_spacing, canvas);
 
 		else if(!parGroup[1].GetStopSignal())
