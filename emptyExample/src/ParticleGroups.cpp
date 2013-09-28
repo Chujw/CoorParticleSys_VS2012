@@ -168,7 +168,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 void ParticleGroups::Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num)
 {
 	ofImage testImage;
-	testImage.loadImage("chair_threshold.png");
+	testImage.loadImage("heart_threshold.png");
 	testImage.resize(ofGetWidth(),ofGetHeight());
 	testImage.setImageType(OF_IMAGE_GRAYSCALE);
 	unsigned char* testedgepixel = testImage.getPixels();
@@ -288,12 +288,9 @@ void ParticleGroups::Simulate(SpacingMap m_spacing, ofImage* m_canvas)
 			TiltUpdate(&particle[thisparID]);	
 			particle[thisparID].Update();	// update position, speed
 			particle[thisparID].PushBackOrFwd(head_par, rear_par,Is_Foreground);
-			if(!particle[thisparID].Is_dying)
-			{
-				particle[thisparID].advance();	// add random factors to direction
-				particle[thisparID].Move2Middle(Is_Foreground,head_par,rear_par);	// coordinate movement
-				TiltControl(&particle[thisparID]);
-			}
+			particle[thisparID].advance();	// add random factors to direction
+			particle[thisparID].Move2Middle(Is_Foreground,head_par,rear_par);	// coordinate movement
+			TiltControl(&particle[thisparID]);
 			iter++;
 		}
 	// after the first update, create the grids

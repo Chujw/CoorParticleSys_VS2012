@@ -45,9 +45,9 @@ void Particle::advance()
 	dtheta = ofRandom(-15,15);    // randomzie direction
 	if(id != -1 && !Is_newborn && !Is_dying)	// for general particles
 	{
-		//if(dtheta*last_tilt<0)
-		//	dtheta = -dtheta;
-		//last_tilt = dtheta;
+		if(dtheta*last_tilt<0)
+			dtheta = -dtheta;
+		last_tilt = dtheta;
 		bearing = bearing + 0.03*radians(dtheta);
 		bearing_vec = ofVec2f(sin(bearing),cos(bearing));
 		angle = degrees(bearing);

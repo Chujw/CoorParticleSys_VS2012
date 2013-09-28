@@ -27,8 +27,9 @@ void testApp::draw(){
 
 	if(cmd == "run")
 	{		
-		for(int iter=0; iter<200;iter++)
+		do
 			m_par.Simulate(&canvas);
+			while(!m_par.canstop());
 		canvas.reloadTexture();
 		canvas.draw(0,0);
 		if(nowSaveImage)

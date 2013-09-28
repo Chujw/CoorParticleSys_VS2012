@@ -47,4 +47,5 @@ public:
 	void StopGroup();
 	void KillGroup();
 	bool canstop();
+
 };
