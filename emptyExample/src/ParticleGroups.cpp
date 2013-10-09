@@ -485,19 +485,27 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 //---------------------------------------------
 void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 {
-	// move A to the middle
-	endpointA->pos.x = (endpointA->pos.x+endpointB->pos.x)/2;
-	endpointA->pos.y = (endpointA->pos.y+endpointB->pos.y)/2;
-	endpointA->bearing_vec = endpointA->bearing_vec + endpointB->bearing_vec;	// A now will point to the average direction
-	endpointA->bearing_vec.normalize();
-	endpointA->bearing = acos(endpointA->bearing_vec.dot(ofVec2f(0,1)));
-	if(endpointA->bearing_vec.x<0)
-		endpointA->bearing = 2*PI-endpointA->bearing;
-	endpointA->angle = degrees(endpointA->bearing);
-	endpointA->speed = DEFAULT_SPEED;
-	kill(endpointB->id);
-	endpointA->Is_dying = false;
-	endpointB->Is_dying = false;
+	if(endpointA->id==head_par || endpointB->id==rear_par)
+	{
+		// move A to the middle
+		endpointA->pos.x = (endpointA->pos.x+endpointB->pos.x)/2;
+		endpointA->pos.y = (endpointA->pos.y+endpointB->pos.y)/2;
+		endpointA->bearing_vec = endpointA->bearing_vec + endpointB->bearing_vec;	// A now will point to the average direction
+		endpointA->bearing_vec.normalize();
+		endpointA->bearing = acos(endpointA->bearing_vec.dot(ofVec2f(0,1)));
+		if(endpointA->bearing_vec.x<0)
+			endpointA->bearing = 2*PI-endpointA->bearing;
+		endpointA->angle = degrees(endpointA->bearing);
+		endpointA->speed = DEFAULT_SPEED;
+		kill(endpointB->id);
+		endpointA->Is_dying = false;
+		endpointB->Is_dying = false;
+	}
+	else
+		//sigmoid movement for A and B
+		endpointA->SigmoidDeath(head_par, rear_par);
+
+
 }
 
 

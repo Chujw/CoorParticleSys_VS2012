@@ -45,8 +45,8 @@ void Particle::advance()
 	dtheta = ofRandom(-15,15);    // randomzie direction
 	if(id != -1 && !Is_newborn && !Is_dying)	// for general particles
 	{
-		if(dtheta*last_tilt<0)
-			dtheta = -dtheta;
+		//if(dtheta*last_tilt<0)
+		//	dtheta = -dtheta;
 		last_tilt = dtheta;
 		bearing = bearing + 0.03*radians(dtheta);
 		bearing_vec = ofVec2f(sin(bearing),cos(bearing));
@@ -65,29 +65,32 @@ void Particle::advance()
 
 void Particle::Move2Middle(bool IsOpenMode, int head_par, int rear_par)
 {
-	//-------------------------------------
-	// Calculate the sigmoid bearing
-	//-------------------------------------
-	float d_sigmoid = GetSigmoidBearing(IsOpenMode, head_par, rear_par, this);
-	//-------------------------------------
-	// Calculate the average bearing
-	//-------------------------------------
-	float d_aver = GetAverageBearing(IsOpenMode, head_par, rear_par, this);
-	//---------------------------------------
-	// Add the new bearing to the old one
-	//---------------------------------------
-	float new_aver_sigmoid = d_aver+d_sigmoid;
-	ofVec2f new_bearing_vec = ofVec2f(sin(new_aver_sigmoid),cos(new_aver_sigmoid));
-	new_bearing_vec.normalize();
-	this->bearing_vec = 0.999*this->bearing_vec + 0.001*new_bearing_vec;		// adjust the bearing through vector
-	this->bearing_vec.normalize();
-	this->bearing = acos(this->bearing_vec.dot(ofVec2f(0,1)));
-	if(this->bearing_vec.x<0)
-		this->bearing = 2*PI-this->bearing;
-	this->angle = degrees(this->bearing);
-			float deg_sig_temp = degrees(this->bearing);
-			ofVec2f test_bearing_vec = ofVec2f(sin(this->bearing),cos(this->bearing));
-			deg_sig_temp = degrees(this->bearing);		
+	if(!this->Is_dying)
+	{
+		//-------------------------------------
+		// Calculate the sigmoid bearing
+		//-------------------------------------
+		float d_sigmoid = GetSigmoidBearing(IsOpenMode, head_par, rear_par, this);
+		//-------------------------------------
+		// Calculate the average bearing
+		//-------------------------------------
+		float d_aver = GetAverageBearing(IsOpenMode, head_par, rear_par, this);
+		//---------------------------------------
+		// Add the new bearing to the old one
+		//---------------------------------------
+		float new_aver_sigmoid = d_aver+d_sigmoid;
+		ofVec2f new_bearing_vec = ofVec2f(sin(new_aver_sigmoid),cos(new_aver_sigmoid));
+		new_bearing_vec.normalize();
+		this->bearing_vec = 0.999*this->bearing_vec + 0.001*new_bearing_vec;		// adjust the bearing through vector
+		this->bearing_vec.normalize();
+		this->bearing = acos(this->bearing_vec.dot(ofVec2f(0,1)));
+		if(this->bearing_vec.x<0)
+			this->bearing = 2*PI-this->bearing;
+		this->angle = degrees(this->bearing);
+				float deg_sig_temp = degrees(this->bearing);
+				ofVec2f test_bearing_vec = ofVec2f(sin(this->bearing),cos(this->bearing));
+				deg_sig_temp = degrees(this->bearing);		
+	}
 }
 
 //------------------------------------------------------------
@@ -174,6 +177,7 @@ float Particle::GetSigmoidBearing(bool IsOpenMode, int head_par, int rear_par, P
 }
 
 
+
 //------------------------------------------------------------
 //
 // return the average of directions
@@ -201,6 +205,101 @@ float Particle::GetAverageBearing(bool IsOpenMode, int head_par, int rear_par, P
 			float test_aver = degrees(d_aver);
 	return d_aver;
 
+}
+
+//------------------------------------------------------------
+//
+// Sigmoid movement for death control	(C--A--B--D, kill B and C)
+//------------------------------------------------------------
+void Particle::SigmoidDeath(int head_par, int rear_par)
+{
+	Particle *A = this;
+	Particle *B = this->next;
+	Particle *C = this->prev;
+	Particle *D = this->next->next;
+
+	if(A->id!=head_par && B->id!=rear_par)
+	{
+		float x;
+		float d_sigmoid = 0;
+		float CA = dist(C,A);
+		float AB = dist(A,B);
+		float CB = CA+AB;
+		float BD = dist(B,D);
+		float mid = (CA+AB+BD)/2;
+
+		//-----------------------------------------------------------------
+		//------------------------- For A:---------------------------------
+		//-----------------------------------------------------------------
+		float Aratio = CA/mid;
+		Aratio = floorf(Aratio * 100) / 100;	// round down to two decimal places
+		//----------------------------------------------------------------
+		if(Aratio<1.0)			// tangent-like shape (move to right)
+		{
+			x = (PI-PI/6)*Aratio - PI/3;	// -60 < x < 90
+			x = floorf(x * 100) / 100;
+			float slope = 1/(cos(x)*cos(x)); // sec square
+			d_sigmoid = atan2(1,slope);
+			if(d_sigmoid>0)
+				d_sigmoid = -d_sigmoid;
+		}
+		else if(Aratio>1.0)			// inverse-tangent-like (move to left)
+		{
+			Aratio = 2-Aratio;
+			Aratio = floorf(Aratio * 100) / 100;
+			x = (PI-PI/6)*Aratio - PI/3;	// -60 < x < 90
+			x = floorf(x * 100) / 100;
+			float slope = 1/(cos(x)*cos(x)); // sec square
+			d_sigmoid = atan2(-1,slope);
+			if(d_sigmoid<0)
+				d_sigmoid = -d_sigmoid;
+		}
+
+		ofVec2f Anew_bearing_vec = ofVec2f(sin(d_sigmoid),cos(d_sigmoid));
+		Anew_bearing_vec.normalize();
+		A->bearing_vec = 0.999*A->bearing_vec + 0.001*Anew_bearing_vec;		// adjust the bearing through vector
+		A->bearing_vec.normalize();
+		A->bearing = acos(A->bearing_vec.dot(ofVec2f(0,1)));
+		if(A->bearing_vec.x<0)
+			A->bearing = 2*PI-A->bearing;
+		A->angle = degrees(A->bearing);
+
+		//-----------------------------------------------------------------
+		//--------------For B:---------------------------------------------
+		//-----------------------------------------------------------------
+		float Bratio = CB/mid;
+		Bratio = floorf(Bratio * 100) / 100;	// round down to two decimal places
+		//----------------------------------------------------------------
+		if(Bratio<1.0)			// tangent-like shape (move to right)
+		{
+			x = (PI-PI/6)*Bratio - PI/3;	// -60 < x < 90
+			x = floorf(x * 100) / 100;
+			float slope = 1/(cos(x)*cos(x)); // sec square
+			d_sigmoid = atan2(1,slope);
+			if(d_sigmoid>0)
+				d_sigmoid = -d_sigmoid;
+		}
+		else if(Bratio>1.0)			// inverse-tangent-like (move to left)
+		{
+			Bratio = 2-Bratio;
+			Bratio = floorf(Bratio * 100) / 100;
+			x = (PI-PI/6)*Bratio - PI/3;	// -60 < x < 90
+			x = floorf(x * 100) / 100;
+			float slope = 1/(cos(x)*cos(x)); // sec square
+			d_sigmoid = atan2(-1,slope);
+			if(d_sigmoid<0)
+				d_sigmoid = -d_sigmoid;
+		}
+
+		ofVec2f Bnew_bearing_vec = ofVec2f(sin(d_sigmoid),cos(d_sigmoid));
+		Bnew_bearing_vec.normalize();
+		B->bearing_vec = 0.999*B->bearing_vec + 0.001*Bnew_bearing_vec;		// adjust the bearing through vector
+		B->bearing_vec.normalize();
+		B->bearing = acos(B->bearing_vec.dot(ofVec2f(0,1)));
+		if(B->bearing_vec.x<0)
+			B->bearing = 2*PI-B->bearing;
+		B->angle = degrees(B->bearing);
+	}
 }
 
 

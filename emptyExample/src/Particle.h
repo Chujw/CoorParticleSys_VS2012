@@ -43,6 +43,7 @@ public:
 	void Move2Middle(bool IsOpenMode, int head_par, int rear_par);
 	float GetSigmoidBearing(bool IsOpenMode, int head_par, int rear_par, Particle* thispar);
 	float GetAverageBearing(bool IsOpenMode, int head_par, int rear_par, Particle* thispar);
+	void SigmoidDeath(int head_par, int rear_par);
 	//int BirthOrDeath(int b_stepsize, int d_stepsize, int b_min_num, int d_max_num);
 	void Update();
 	void advance();	// add some random direction factors

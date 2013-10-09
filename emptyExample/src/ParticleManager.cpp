@@ -92,17 +92,17 @@ void ParticleManager::Simulate(ofImage* canvas)
 		if(!parGroup[0].GetStopSignal())
 			parGroup[0].Simulate(m_spacing, canvas);
 
-		else if(!parGroup[1].GetStopSignal())
-		{
-			if(!Saved1stGroup)
-			{
-			ofImage saveimage;
-			saveimage.clone(*canvas);
-			saveimage.saveImage("2ndGroup.png");
-			Saved1stGroup = true;
-			}
-			parGroup[1].Simulate(m_spacing, canvas);
-		}
+		//else if(!parGroup[1].GetStopSignal())
+		//{
+		//	if(!Saved1stGroup)
+		//	{
+		//	ofImage saveimage;
+		//	saveimage.clone(*canvas);
+		//	saveimage.saveImage("2ndGroup.png");
+		//	Saved1stGroup = true;
+		//	}
+		//	parGroup[1].Simulate(m_spacing, canvas);
+		//}
 		else
 		{	Mngr_canstop = true;
 			ofImage saveimage;
