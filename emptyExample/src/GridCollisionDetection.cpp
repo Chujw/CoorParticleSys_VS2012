@@ -531,6 +531,8 @@ void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Par
 						if(thispar.childbeacon == next && thispar.next->parentbeacon == thispar.beacon_id)	// goes apart from each other
 							donotkill = true;
 					}
+					else if(grids[grid_id].grid_pars[i].Is_dying)	// if it is dying, do not kill now
+						donotkill = true;
 				}
 
 				// mark the collision pars into parlist
@@ -616,7 +618,8 @@ bool GridCollisionDetection::Collide(int cur_pixel_id, Particle thispar)
 			donotkill = true;
 		else if(thispar.parentbeacon == thispar.next->beacon_id && thispar.next->beacon_id == grid_pixels[cur_pixel_id])
 			donotkill = true;
-
+		else if(grid_pixels[cur_pixel_id]==thispar.dyingwith && !thispar.Is_dying)
+			donotkill = true;
 		if(!donotkill)
 			return true;
 	}

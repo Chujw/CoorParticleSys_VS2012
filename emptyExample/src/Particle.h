@@ -6,9 +6,9 @@
 #define		BIRTH	1
 //#define NUM 3
 #define DEFAULT_SPEED		0.5 
-#define DEFAULT_LINEWIDTH	1
+#define DEFAULT_LINEWIDTH	2
 #define LINEMAX		2
-#define	LINEMIN		0
+#define	LINEMIN		2
 //#define	BEARING_LIMIT	
 
 class Particle {
@@ -27,6 +27,7 @@ public:
 	Particle* next;
 	int parentbeacon;
 	int childbeacon;
+	int dyingwith;
 	bool Is_released;
 	bool Was_released;
 	bool Is_newborn;

@@ -371,10 +371,13 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 				if(!endpointA->Is_dying)	// mark them as dying...
 				{
 					endpointA->Is_dying = true;
+					endpointA->dyingwith = endpointB->beacon_id;
 				}
 				if(!endpointB->Is_dying)
 				{
 					endpointB->Is_dying = true;
+					endpointB->dyingwith = endpointA->beacon_id;
+					cout<<endpointA->beacon_id<<" and "<<endpointB->beacon_id<<" are dying..."<<endl;
 				}
 				if(tempA.id == numpt-1)	// if A is the last one (A will be deleted)
 				{
@@ -437,6 +440,7 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	particle[numpt].next->prev = &particle[numpt];
 	particle[numpt].parentbeacon = endpointA->beacon_id;
 	particle[numpt].prev->childbeacon = beacon_num;
+	particle[numpt].dyingwith = -1;
 	particle[numpt].last_tilt = particle[numpt].bearing;
 	particle[numpt].tilt_limit = TILT_LIMIT;
 	particle[numpt].tilt_control = 0;
@@ -502,9 +506,18 @@ void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 		endpointB->Is_dying = false;
 	}
 	else
+	{
 		//sigmoid movement for A and B
 		endpointA->SigmoidDeath(head_par, rear_par);
-
+		float dist = distAB(endpointA, endpointB);
+		if(dist<=2)
+		{
+			kill(endpointB->id);
+ 			endpointA->Is_dying = false;
+			endpointB->Is_dying = false;
+		}
+		
+	}
 
 }
 
@@ -659,6 +672,7 @@ bool ParticleGroups::GetStopSignal()
 //---------------------------------------------
 void ParticleGroups::kill(int indexID)
 {
+	cout<<"killing "<<particle[indexID].beacon_id<<endl;
 	// break the link for this slot
 	particle[indexID].prev->next = particle[indexID].next;
 	particle[indexID].next->prev = particle[indexID].prev;
@@ -678,6 +692,7 @@ void ParticleGroups::kill(int indexID)
 		// copy the last one to this slot
 		particle[indexID] = particle[numpt-1];
 		particle[indexID].id = indexID;
+		
 		// relink the last one's pointers
 		particle[numpt-1].next->prev = &particle[indexID];
 		particle[numpt-1].prev->next = &particle[indexID];
@@ -699,7 +714,7 @@ void ParticleGroups::kill(int indexID)
 
 	// delete the last one
 	particle[numpt-1] = NULL;	// killed it
-
+	particle[numpt-1].dyingwith = -1;
 	// update the ids in the grids
 	if(FillGrids)
 	{
@@ -801,6 +816,14 @@ void ParticleGroups::GridsCollisionKill()
 					// kill itself also
 					if(particle[i].Is_released)
 					{
+						if(particle[i].Is_dying)
+						{
+							particle[i].Is_dying = false;
+							if(particle[i].dyingwith == particle[i].prev->beacon_id)
+								particle[i].prev->Is_dying = false;
+							else if(particle[i].dyingwith == particle[i].next->beacon_id)
+								particle[i].next->Is_dying = false;
+						}
 						if(!Is_Foreground)
 							kill(particle[i].id);
 						else if(Is_Foreground && i!=head_par && i!=rear_par)

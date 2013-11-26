@@ -291,7 +291,7 @@ void Particle::SigmoidDeath(int head_par, int rear_par)
 				d_sigmoid = -d_sigmoid;
 		}
 
-		ofVec2f Bnew_bearing_vec = ofVec2f(sin(d_sigmoid),cos(d_sigmoid));
+		ofVec2f Bnew_bearing_vec = ofVec2f(sin(d_sigmoid),-cos(d_sigmoid));
 		Bnew_bearing_vec.normalize();
 		B->bearing_vec = 0.999*B->bearing_vec + 0.001*Bnew_bearing_vec;		// adjust the bearing through vector
 		B->bearing_vec.normalize();
