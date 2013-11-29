@@ -620,8 +620,15 @@ bool GridCollisionDetection::Collide(int cur_pixel_id, Particle thispar)
 			donotkill = true;
 		else if(grid_pixels[cur_pixel_id]==thispar.dyingwith && !thispar.Is_dying)
 			donotkill = true;
+		else if(grid_pixels[cur_pixel_id]==thispar.diedwith)
+			donotkill = true;
+		else if(thispar.Is_newborn)
+			donotkill = true;
 		if(!donotkill)
+		{
+			cout<<thispar.beacon_id<<" steps on "<<grid_pixels[cur_pixel_id]<<endl;
 			return true;
+		}
 	}
 	return false;
 }

@@ -72,6 +72,8 @@ void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_num
 		particle[i].Was_released = true;
 		particle[i].Is_newborn = false;
 		particle[i].Is_dying = false;
+		particle[i].diedwith = -1;
+		particle[i].dyingwith = -1;
 		particle[i].c = COLOR;
 		if(i==0)	// for head particle
 		{
@@ -137,6 +139,8 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 		particle[i].Was_released = true;
 		particle[i].Is_newborn = false;
 		particle[i].Is_dying = false;
+		particle[i].diedwith = -1;
+		particle[i].dyingwith = -1;
 		particle[i].c = COLOR;
 
 		if(i==0)	// for head particle
@@ -366,7 +370,7 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 			endpointA->UpdateSpacingTd(Apixel_threshold);// update its last_spacing_threshold
 			aver_threshold = 0.5 * (endpointA->last_spacing_threshold + endpointB->last_spacing_threshold);	// update the average threshold
 			float AB = distAB(endpointA,endpointB);
-			if(AB<DTH_OFFSET*aver_threshold && (endpointA->Is_dying == endpointB->Is_dying))	
+			if((AB<DTH_OFFSET*aver_threshold && (endpointA->Is_dying == endpointB->Is_dying)) || (endpointA->Is_dying && endpointB->Is_dying))	
 			{	// death
 				if(!endpointA->Is_dying)	// mark them as dying...
 				{
@@ -441,6 +445,7 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	particle[numpt].parentbeacon = endpointA->beacon_id;
 	particle[numpt].prev->childbeacon = beacon_num;
 	particle[numpt].dyingwith = -1;
+	particle[numpt].diedwith = -1;
 	particle[numpt].last_tilt = particle[numpt].bearing;
 	particle[numpt].tilt_limit = TILT_LIMIT;
 	particle[numpt].tilt_control = 0;
@@ -501,9 +506,9 @@ void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 			endpointA->bearing = 2*PI-endpointA->bearing;
 		endpointA->angle = degrees(endpointA->bearing);
 		endpointA->speed = DEFAULT_SPEED;
-		kill(endpointB->id);
 		endpointA->Is_dying = false;
 		endpointB->Is_dying = false;
+		kill(endpointB->id);
 	}
 	else
 	{
@@ -512,9 +517,14 @@ void ParticleGroups::death(Particle* endpointA, Particle* endpointB)
 		float dist = distAB(endpointA, endpointB);
 		if(dist<=2)
 		{
-			kill(endpointB->id);
+			cout<<endpointA->beacon_id<<" and "<<endpointB->beacon_id<<" are close enough to die."<<endl;
+			endpointA->diedwith = endpointB->beacon_id;
+			endpointB->diedwith = endpointA->beacon_id;
+			endpointA->dyingwith = -1;
+			endpointB->dyingwith = -1;
  			endpointA->Is_dying = false;
 			endpointB->Is_dying = false;
+			kill(endpointB->id);
 		}
 		
 	}
@@ -672,7 +682,7 @@ bool ParticleGroups::GetStopSignal()
 //---------------------------------------------
 void ParticleGroups::kill(int indexID)
 {
-	cout<<"killing "<<particle[indexID].beacon_id<<endl;
+	cout<<"killing "<<particle[indexID].beacon_id<<"; pos: "<<particle[indexID].pos.x<<","<<particle[indexID].pos.y<<endl;
 	// break the link for this slot
 	particle[indexID].prev->next = particle[indexID].next;
 	particle[indexID].next->prev = particle[indexID].prev;
@@ -796,7 +806,52 @@ void ParticleGroups::GridsCollisionKill()
 				vector<Particle> parlist;
 				parlist = grid.CollisionDetection(particle[i]);
 
+				//// kill all the pars which are on the list
+				//if(parlist.size()>0)
+				//{
+				//	for(int index=0; index<parlist.size();index++)
+				//	{
+				//		int collisionID = parlist[index].id;
+				//		if(particle[collisionID].Is_released)	// in case some pars in the list has been killed already
+				//		{
+				//			if(collisionID != particle[i].id)	// do not kill it self now, in case of double kill
+				//			{
+				//				cout<<"grid collision, kill "<<collisionID<<endl;
+				//				if(!Is_Foreground)
+				//					kill(collisionID);	// kill the par in particle group and erase from grid
+				//				else if(Is_Foreground && collisionID!=head_par && collisionID!=rear_par)
+				//					kill(collisionID); // In an open-area case, do not kill head par and rear par
+				//			}
+				//		}
+				//	}
+				//	// kill itself also
+				//	if(particle[i].Is_released)
+				//	{
+				//		if(particle[i].Is_dying)
+				//		{
+				//			particle[i].Is_dying = false;
+				//			if(particle[i].dyingwith == particle[i].prev->beacon_id)
+				//			{
+				//				particle[i].prev->Is_dying = false;
+				//				particle[i].diedwith = particle[i].prev->beacon_id;
+				//				particle[i].prev->diedwith = particle[i].beacon_id;
+				//			}
+				//			else if(particle[i].dyingwith == particle[i].next->beacon_id)
+				//			{
+				//				particle[i].next->Is_dying = false;
+				//				particle[i].diedwith = particle[i].prev->beacon_id;
+				//				particle[i].prev->diedwith = particle[i].beacon_id;
+				//			}
+				//		}
+				//		cout<<"grid collision, kill itself "<<particle[i].beacon_id<<endl;
+				//		if(!Is_Foreground)
+				//			kill(particle[i].id);
+				//		else if(Is_Foreground && i!=head_par && i!=rear_par)
+				//			kill(particle[i].id);
+				//	}
+
 				// kill all the pars which are on the list
+				bool killitself = false;
 				if(parlist.size()>0)
 				{
 					for(int index=0; index<parlist.size();index++)
@@ -806,27 +861,55 @@ void ParticleGroups::GridsCollisionKill()
 						{
 							if(collisionID != particle[i].id)	// do not kill it self now, in case of double kill
 							{
+								cout<<"grid collision, kill "<<collisionID<<endl;
+								if(particle[collisionID].Is_dying)
+								{
+									particle[collisionID].Is_dying = false;
+									if(particle[collisionID].dyingwith == particle[collisionID].prev->beacon_id)
+									{
+										particle[collisionID].prev->Is_dying = false;
+										particle[collisionID].diedwith = particle[collisionID].prev->beacon_id;
+										particle[collisionID].prev->diedwith = particle[collisionID].beacon_id;
+									}
+									else if(particle[collisionID].dyingwith == particle[collisionID].next->beacon_id)
+									{
+										particle[collisionID].next->Is_dying = false;
+										particle[collisionID].diedwith = particle[collisionID].prev->beacon_id;
+										particle[collisionID].prev->diedwith = particle[collisionID].beacon_id;
+									}
+								}
 								if(!Is_Foreground)
 									kill(collisionID);	// kill the par in particle group and erase from grid
-								else if(Is_Foreground && collisionID!=head_par && collisionID!=rear_par)
+								else if(Is_Foreground/* && collisionID!=head_par && collisionID!=rear_par*/)
 									kill(collisionID); // In an open-area case, do not kill head par and rear par
 							}
+							else
+								killitself = true;
 						}
 					}
 					// kill itself also
-					if(particle[i].Is_released)
+					if(particle[i].Is_released && killitself)
 					{
 						if(particle[i].Is_dying)
 						{
 							particle[i].Is_dying = false;
 							if(particle[i].dyingwith == particle[i].prev->beacon_id)
+							{
 								particle[i].prev->Is_dying = false;
+								particle[i].diedwith = particle[i].prev->beacon_id;
+								particle[i].prev->diedwith = particle[i].beacon_id;
+							}
 							else if(particle[i].dyingwith == particle[i].next->beacon_id)
+							{
 								particle[i].next->Is_dying = false;
+								particle[i].diedwith = particle[i].prev->beacon_id;
+								particle[i].prev->diedwith = particle[i].beacon_id;
+							}
 						}
+						cout<<"grid collision, kill itself "<<particle[i].beacon_id<<endl;
 						if(!Is_Foreground)
 							kill(particle[i].id);
-						else if(Is_Foreground && i!=head_par && i!=rear_par)
+						else if(Is_Foreground/* && i!=head_par && i!=rear_par*/)
 							kill(particle[i].id);
 					}
 				}
