@@ -52,7 +52,7 @@ void ParticleManager::CreateEdgeChain()
 	// setup the map of open areas
 	int allpixels_num = 0;
 	ofVec2f* AllPixelsInChain = edgemap[num_map].GetAllPixelsInChain(&allpixels_num);
-	parGroup[0].Setup_Foreground_map(AllPixelsInChain, allpixels_num);
+	parGroup[0].Setup_Background_map(AllPixelsInChain, allpixels_num);
 	//------------------------------------------------------
 	// For particles in open areas
 	//------------------------------------------------------
@@ -85,12 +85,12 @@ void ParticleManager::Simulate(ofImage* canvas)
 {
 	if(!Mngr_canstop)
 	{
-		//// uncomment it if need a third group
-		//if(!parGroup[2].GetStopSignal())
-		//	parGroup[2].Simulate(m_spacing, canvas);
-		
+		// uncomment it if need a third group
 		if(!parGroup[0].GetStopSignal())
 			parGroup[0].Simulate(m_spacing, canvas);
+		//
+		//else if(!parGroup[2].GetStopSignal())
+		//	parGroup[2].Simulate(m_spacing, canvas);
 
 		else if(!parGroup[1].GetStopSignal())
 		{

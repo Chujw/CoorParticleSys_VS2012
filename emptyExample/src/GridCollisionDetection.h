@@ -6,7 +6,7 @@
 #define		REG_MAX_PARTICLES	10
 #define		GRID_ROW			100
 #define		GRID_COL			100
-#define		COLLISION_KILL_DIST		3
+#define		COLLISION_KILL_DIST		2
 //#define		PIXEL_KILL_DIST		1
 
 struct Gridblock{
@@ -47,4 +47,6 @@ public:
 	bool Collide(int cur_pixel_id, Particle thispar);
 	int findpar(int beacon_id);
 	long int getbeacon(int pos);
+	//int GetParInGridPixel(int pixel_id);
+	bool StepsOnAGivenPar(Particle thispar, int beacon_id);
 };

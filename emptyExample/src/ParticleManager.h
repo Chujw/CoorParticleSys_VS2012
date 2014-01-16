@@ -14,11 +14,11 @@
 #define EDGE_START		ofVec2f(-XD/5,YD-1)
 #define	EDGE_END		ofVec2f(XD+XD/5,YD-1)
 
-#define SECOND_EDGE_START		ofVec2f(1100,363)
-#define SECOND_EDGE_END		ofVec2f(-100,-453)
+#define SECOND_EDGE_START		ofVec2f(XD+1000,1163)
+#define SECOND_EDGE_END		ofVec2f(3000,-853)
 
-#define BKG_START		ofVec2f(1,-YD/5)
-#define BKG_END			ofVec2f(1,YD+YD/5)
+#define BKG_START		ofVec2f(1,-YD/3)
+#define BKG_END			ofVec2f(1,YD+YD/3)
 
 class ParticleManager{
 private:

@@ -8,6 +8,7 @@
 //#include "Quadtree.h"
 #include "GridCollisionDetection.h"
 
+
 //#define DEFAULT_NUM			70
 //#define DEFAULT_SPACING		50
 #define BRH_OFFSET		1.41/**DEFAULT_SPACING*/	 	// stepsize for birth control	141% of spacing (1.41%)
@@ -16,6 +17,8 @@
 #define DTH_MAX_NUM			5	// every DTH_BLOCKSIZE could at most have DTH_MAX_NUM of particles (default mode : same as above)
 #define TILT_LIMIT			rand()%60 +20
 #define COLOR			0/*ofColor(rand()%255, rand()%255,rand()%255)*/
+
+
 
 class ParticleGroups{
 private:
@@ -38,6 +41,7 @@ public:
 	void Setup();
 	void Setup_parlist_bkg(ofVec2f* parlist, int closepar_numpt, SpacingMap m_spacing);
 	void Setup_parlist_forg(ofVec2f* parlist,int openpar_numpt,SpacingMap m_spacing);
+	void Setup_Background_map(ofVec2f* AllPixelsInChain, int allpixels_num);	// setup the map of open area via parlist
 	void Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num);	// setup the map of open area via parlist
 	void Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num);
 	void Simulate(SpacingMap m_spacing, ofImage* m_canvas);
@@ -55,11 +59,12 @@ public:
 	void BoundaryControl_Window();
 	void BoundaryControl_Foreground();
 
-	bool OutOfForeground(Particle thispar);
+	bool OutOfFeatureMap(Particle thispar);
 
 	void kill(int indexID);
 	void SetAsRegular(Particle* A, Particle* B, float birth_dist);
-		
+	void FixDyingFlags(Particle* A);
+
 	void CreateGrids();
 	void UpdateGrids();
 	void GridsCollisionKill();

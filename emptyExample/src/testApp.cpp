@@ -6,12 +6,17 @@ void testApp::setup(){
 	edgeImage.allocate(ofGetWidth(),ofGetHeight(),OF_IMAGE_COLOR);	// white empty image
 	srcImage.allocate(ofGetWidth(),ofGetHeight(),OF_IMAGE_GRAYSCALE);
 	canvas.allocate(ofGetWidth(),ofGetHeight(),OF_IMAGE_GRAYSCALE);
+	int i = 0;
+	while(i<canvas.getPixelsRef().size()){	// make the image white
+		canvas.getPixelsRef()[i] = 255;
+		i++;
+	}
 	bStop = false;
 	showEGmap = false;
 	nowSaveImage = false;
 	cmd = "default";
 	snapCounter = 0;
-	ofBackground(255);
+	ofBackground(255,255,255);
 	ofSetBackgroundAuto(false);
 	m_par.Setup(&edgeImage,&srcImage);
 	//edgeImage = m_par.GetEdgeImage();	
@@ -30,10 +35,10 @@ void testApp::draw(){
 		//do
 		//	m_par.Simulate(&canvas);
 		//while(!m_par.canstop());
-
-		for(int i =0; i<10; i++)
+		for(int i =0; i<5000; i++)
 			m_par.Simulate(&canvas);
 		canvas.reloadTexture();
+		ofSetColor(255);
 		canvas.draw(0,0);
 		if(nowSaveImage)
 		{

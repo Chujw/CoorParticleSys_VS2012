@@ -1,13 +1,13 @@
 #pragma once
 
 #include "ofMain.h"
-#define		BASE_SPACING	15
+#define		BASE_SPACING	4.5
 //#define		MID_BASE_SPACING	20
 //#define		LEFT_VIABLE		1
 //#define		MID_VIABLE	1
 //#define		RIGHT_VIABLE		1
-#define		MIN_SP_VIABLE	1
-#define		MAX_SP_VIABLE	5
+#define		MIN_SP_VIABLE	2
+#define		MAX_SP_VIABLE	9
 
 
 

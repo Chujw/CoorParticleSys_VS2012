@@ -30,6 +30,11 @@ Particle::Particle(float theta, float sp)
 	Is_released = false;
 	Is_newborn = false;
 	Is_dying = false;
+	Is_visible = false;
+	//visibility_timer = 0;
+	//linewidth_timer_zero = LINEWD_TIMER_LIMIT_ZERO;
+	//linewidth_timer_reg = 0;
+	crushAt = pos;
 	grid_id = -1;
 }
 
@@ -255,7 +260,8 @@ void Particle::SigmoidDeath(int head_par, int rear_par)
 				d_sigmoid = -d_sigmoid;
 		}
 
-		ofVec2f Anew_bearing_vec = ofVec2f(sin(d_sigmoid),cos(d_sigmoid));
+		float d_Anew = A->bearing + d_sigmoid;
+		ofVec2f Anew_bearing_vec = ofVec2f(sin(d_Anew),cos(d_Anew));
 		Anew_bearing_vec.normalize();
 		A->bearing_vec = 0.999*A->bearing_vec + 0.001*Anew_bearing_vec;		// adjust the bearing through vector
 		A->bearing_vec.normalize();
@@ -291,7 +297,8 @@ void Particle::SigmoidDeath(int head_par, int rear_par)
 				d_sigmoid = -d_sigmoid;
 		}
 
-		ofVec2f Bnew_bearing_vec = ofVec2f(sin(d_sigmoid),-cos(d_sigmoid));
+		float d_Bnew = B->bearing + d_sigmoid;
+		ofVec2f Bnew_bearing_vec = ofVec2f(sin(d_Bnew),cos(d_Bnew));
 		Bnew_bearing_vec.normalize();
 		B->bearing_vec = 0.999*B->bearing_vec + 0.001*Bnew_bearing_vec;		// adjust the bearing through vector
 		B->bearing_vec.normalize();
@@ -307,7 +314,7 @@ bool Particle::PushBackOrFwd(int head, int rear, bool IsOpenMode)
 {
 	// In an open area mode, do not puch back or foward a head or rear
 	// NOTE that the head and rear par will still be pushed through their neighbors
-	if(/*IsOpenMode && */this->id == head || this->id == rear)	
+	if(this->id == head || this->id == rear)	
 		return false;
 	else
 	{
@@ -354,24 +361,25 @@ bool Particle::OutOfBoudaryKill()
 
 //----------------------------------------------------------------------
 //
-// update spacing threshold (it'll update the line width automatically)
+// update spacing threshold (it'll update the linewidth automatically)
 //
 //----------------------------------------------------------------------
 bool Particle::UpdateSpacingTd(float Td)
 {
+	
 	float currentTd = Td;
 	currentTd = floorf(currentTd * 1000) / 1000;	// round down to two decimal places
 	last_spacing_threshold = floorf(last_spacing_threshold * 1000) / 1000; 
 	if(last_spacing_threshold < currentTd)
 	{
-		last_spacing_threshold += 0.0015;
-		UpdateLineWidth(Td,MIN_SP_VIABLE,MAX_SP_VIABLE);
+		last_spacing_threshold += 0.015;
+		UpdateLineWidth(currentTd,MIN_SP_VIABLE,MAX_SP_VIABLE);
 		return false;
 	}
 	else if(last_spacing_threshold > currentTd)
 	{
-		last_spacing_threshold -= 0.0015;
-		UpdateLineWidth(Td,MIN_SP_VIABLE,MAX_SP_VIABLE);
+		last_spacing_threshold -= 0.015;
+		UpdateLineWidth(currentTd,MIN_SP_VIABLE,MAX_SP_VIABLE);
 		return false;
 	}
 	else if(last_spacing_threshold == currentTd)
@@ -385,6 +393,25 @@ float Particle::UpdateLineWidth(float currentTd, float minTd, float maxTd)
 	// rescale a new linewidth based on the scale of threshold
 	//float new_linewidth = ((currentTd/BASE_SPACING-minTd)*(LINEMAX-LINEMIN)) / (maxTd-minTd) + LINEMIN;
 	float new_linewidth = -((currentTd/BASE_SPACING-minTd)*(LINEMAX-LINEMIN)) / (maxTd-minTd) + LINEMAX;// larger spacing, smaller linewidth
+	
+	//if(currentTd>= 4*BASE_SPACING*MAX_SP_VIABLE/5 && linewidth_timer_reg >= LINEWD_TIMER_LIMIT_REG)	// if current threshold exceed 4/5 max spacing threshold && it's not in zero linewidth mode
+	//{
+	//	linewidth_timer_reg = 0;
+	//	linewidth_timer_zero++;
+	//	new_linewidth = 0;
+	//}
+	//else if(currentTd<4*BASE_SPACING*MAX_SP_VIABLE/5 && linewidth_timer_zero >= LINEWD_TIMER_LIMIT_ZERO)	//  if current threshold not exceed 4/5 max spacing threshold && it's in zero linewidth mode
+	//{
+	//	linewidth_timer_zero = 0;
+	//	linewidth_timer_reg++;
+	//}
+
+	//if(currentTd>= 5*BASE_SPACING*MAX_SP_VIABLE/6)	// if current threshold exceed 4/5 max spacing threshold && it's not in zero linewidth mode
+	//{
+	//	new_linewidth = 0;
+	//}
+
+
 	if(this->linewidth < new_linewidth)
 	{
 		linewidth += 0.5;
@@ -392,8 +419,8 @@ float Particle::UpdateLineWidth(float currentTd, float minTd, float maxTd)
 	else if(this->linewidth > new_linewidth)
 	{
 		linewidth -= 0.5;
-		if(linewidth<0)
-			linewidth = 0;
+		if(linewidth<1 && linewidth > 0)
+			linewidth = 1;
 	}
 	return new_linewidth;
 }

@@ -6,20 +6,23 @@
 #define		BIRTH	1
 //#define NUM 3
 #define DEFAULT_SPEED		0.5 
-#define DEFAULT_LINEWIDTH	1
-#define LINEMAX		2
-#define	LINEMIN		0
+#define DEFAULT_LINEWIDTH	0
+#define LINEMAX		4
+#define	LINEMIN		1
 //#define	BEARING_LIMIT	
-
+//#define VISIBILITY_TIMER_LIMIT	0
+//#define LINEWD_TIMER_LIMIT_REG	0
+//#define LINEWD_TIMER_LIMIT_ZERO 0	// must larger than SPACING_TIMER_LIMIT_ON
 class Particle {
 
 public:
 
+	ofVec2f pos;
 	float angle;
 	float bearing;	// the rotate angle in clockwise direction from the north line
 	ofVec2f bearing_vec;	// the vector of bearing
-	ofVec2f pos;
 	ofVec2f last_pos;
+	ofVec2f crushAt; // the location it killed or died with neighbors
 	float speed;
 	int id;
 	int beacon_id;
@@ -31,6 +34,9 @@ public:
 	int diedwith;
 	bool Is_released;
 	bool Was_released;
+	bool Is_visible;
+	bool Was_visible;
+	//int visibility_timer;
 	bool Is_newborn;
 	bool Is_dying;
 	float last_tilt;
@@ -39,6 +45,8 @@ public:
 	ofColor c;
 	float linewidth;
 	float last_spacing_threshold;
+	//int linewidth_timer_reg;
+	//int linewidth_timer_zero;
 	int grid_id;
 
 	Particle(float theta=0, float sp=0.5);

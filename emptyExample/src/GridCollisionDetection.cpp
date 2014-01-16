@@ -531,7 +531,7 @@ void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Par
 						if(thispar.childbeacon == next && thispar.next->parentbeacon == thispar.beacon_id)	// goes apart from each other
 							donotkill = true;
 					}
-					else if(grids[grid_id].grid_pars[i].Is_dying)	// if it is dying, do not kill now
+					else if(grids[grid_id].grid_pars[i].Is_dying)	// if the candidate is dying, do not kil
 						donotkill = true;
 				}
 
@@ -551,17 +551,7 @@ void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Par
 //----------------------------------------------------------------
 bool GridCollisionDetection::CheckPixelInGrid(vector<Particle>* parlist, Particle thispar)
 {
-	// get the pixel position of thispar
-	//int XinGrid = thispar.pos.x - grids[grid_id].x;
-	//int YinGrid = thispar.pos.y - grids[grid_id].y;
-	//int thispixel_id = XinGrid + YinGrid * gridblock_w;
-
-
-	// get the pixel color inside the PIXEL_KILL_DIST
-
-	//if(thispar.pos.y>=639 && thispar.pos.y<= 650)
-	//	cout<<"found it......"<<endl;
-	if(thispar.Is_released)
+	if(thispar.Is_released/* && !thispar.Is_dying*/)
 	{
 		//for(int j=thispar.pos.y-PIXEL_KILL_DIST; j>=0 && j<=thispar.pos.y+PIXEL_KILL_DIST && j<ofGetHeight(); j++)
 		//{
@@ -610,27 +600,64 @@ bool GridCollisionDetection::Collide(int cur_pixel_id, Particle thispar)
 	bool donotkill = false;
 	if(cur_pixel_id >=0 && grid_pixels[cur_pixel_id]>=0 && grid_pixels[cur_pixel_id]!=thispar.beacon_id)	// if find some pixels have others' id
 	{
+		//if collides with its newborn child
 		if(thispar.next->beacon_id == grid_pixels[cur_pixel_id] && thispar.next->Is_newborn && thispar.childbeacon == thispar.next->beacon_id)
 			donotkill = true;
+		//if collides with its new parent
 		else if(thispar.prev->beacon_id == grid_pixels[cur_pixel_id] && thispar.Is_newborn && thispar.parentbeacon == thispar.prev->beacon_id)
 			donotkill = true;
+		//if collides with its parent (in front of it)
 		else if(thispar.parentbeacon == thispar.prev->beacon_id && thispar.prev->beacon_id == grid_pixels[cur_pixel_id])
 			donotkill = true;
+		//if collides with its parent (next to it)
 		else if(thispar.parentbeacon == thispar.next->beacon_id && thispar.next->beacon_id == grid_pixels[cur_pixel_id])
 			donotkill = true;
-		else if(grid_pixels[cur_pixel_id]==thispar.dyingwith && !thispar.Is_dying)
+
+		//if collides with the one it's currently dying with (should not occur this case, can delete this later)
+		else if(grid_pixels[cur_pixel_id]==thispar.dyingwith)
 			donotkill = true;
+		//if collides with (steps on) the one it just died with
 		else if(grid_pixels[cur_pixel_id]==thispar.diedwith)
 			donotkill = true;
-		else if(thispar.Is_newborn)
-			donotkill = true;
+		//else if(thispar.Is_newborn)	// no need to enable this -- a particle who hasn't move out of its death zone will not give birth
+		//	donotkill = true;
 		if(!donotkill)
 		{
-			cout<<thispar.beacon_id<<" steps on "<<grid_pixels[cur_pixel_id]<<endl;
+			//cout<<thispar.beacon_id<<" steps on "<<grid_pixels[cur_pixel_id]<<endl;
 			return true;
 		}
 	}
 	return false;
+}
+
+//int GridCollisionDetection::GetParInGridPixel(int pixel_id)
+//{
+//	return grid_pixels[pixel_id];
+//}
+
+bool GridCollisionDetection::StepsOnAGivenPar(Particle thispar, int beacon_id)
+{
+	int cur_pixel_id0 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
+	int cur_pixel_id1 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
+	int cur_pixel_id2 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
+	int cur_pixel_id3 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
+
+	if(cur_pixel_id0<0 || cur_pixel_id0>=ofGetWidth()*ofGetHeight())
+		cur_pixel_id0 = -1;
+	if(cur_pixel_id1<0 || cur_pixel_id1>=ofGetWidth()*ofGetHeight())
+		cur_pixel_id1 = -1;
+	if(cur_pixel_id2<0 || cur_pixel_id2>=ofGetWidth()*ofGetHeight())
+		cur_pixel_id2 = -1;
+	if(cur_pixel_id3<0 || cur_pixel_id3>=ofGetWidth()*ofGetHeight())
+		cur_pixel_id3 = -1;
+
+	if((cur_pixel_id0 >=0 && grid_pixels[cur_pixel_id0]==beacon_id) ||
+		(cur_pixel_id1 >=0 && grid_pixels[cur_pixel_id1]==beacon_id) ||
+		(cur_pixel_id2 >=0 && grid_pixels[cur_pixel_id2]==beacon_id) ||
+		(cur_pixel_id3 >=0 && grid_pixels[cur_pixel_id3]==beacon_id))
+		return true;
+	else
+		return false;
 }
 
 int GridCollisionDetection::findpar(int beacon)

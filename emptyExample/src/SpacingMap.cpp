@@ -14,12 +14,11 @@ void SpacingMap::PixelSpaceViables(float* grayscale_pixels, float min, float max
 			spaceViables_map[index] = grayscale_pixels[index]*(max-min)/255 + min;
 			float tempcheckviable = spaceViables_map[index];
 			if(spaceViables_map[index]>max)
-				spaceViables_map[index] = max;
+				spaceViables_map[index] = max; 
 			else if(spaceViables_map[index]<min)
 				spaceViables_map[index] = min;
 		}
 	}
-
 }
 
 void SpacingMap::PixelThresholds()	
@@ -53,5 +52,5 @@ float SpacingMap::GetBaseThreshold(int x, int y)
 
 float SpacingMap::GetDefaultSpacing()
 {
-	return BASE_SPACING;
+	return BASE_SPACING * (MIN_SP_VIABLE+MAX_SP_VIABLE)/2;
 }

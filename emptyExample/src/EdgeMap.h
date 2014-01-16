@@ -23,6 +23,9 @@
 #define CHAIN_NUM			7000
 #define DIRECTION_OPEN_AREA		90
 
+#define MASK_IMAGE		"butterfly_thresh.png"
+#define SRC_IMAGE		"butterfly.jpg"
+
 class EdgeMap{
 private:
 	ofImage canvas;
