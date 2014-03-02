@@ -28,9 +28,6 @@
     <ClCompile Include="src\ParticleManager.cpp">
       <Filter>src\Particles</Filter>
     </ClCompile>
-    <ClCompile Include="src\makePDF.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">
@@ -82,9 +79,6 @@
     </ClInclude>
     <ClInclude Include="src\ParticleManager.h">
       <Filter>src\Particles</Filter>
-    </ClInclude>
-    <ClInclude Include="src\makePDF.h">
-      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

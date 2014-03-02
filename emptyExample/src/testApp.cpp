@@ -14,8 +14,7 @@ void testApp::setup(){
 	bStop = false;
 	showEGmap = false;
 	nowSaveImage = false;
-	pdfmaker = false;
-	cmd = "run";
+	cmd = "default";
 	snapCounter = 0;
 	ofBackground(255,255,255);
 	ofSetBackgroundAuto(false);
@@ -30,10 +29,7 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	if( pdfmaker )
-	{
-		ofBeginSaveScreenAsPDF("testpdf-"+ofGetTimestampString()+".pdf");
-	}
+
 	if(cmd == "run")
 	{		
 		//do
@@ -58,11 +54,7 @@ void testApp::draw(){
 		showEGmap = true;
 	}
 
-	if(pdfmaker)
-	{
-		ofEndSaveScreenAsPDF();
-		pdfmaker =false;
-	}
+
 }
 
 //--------------------------------------------------------------
@@ -83,7 +75,6 @@ void testApp::keyPressed(int key){
 		break;
 	case 's':	// save image	
 		nowSaveImage = true;
-		pdfmaker = true;
 		break;
 
 	default:
