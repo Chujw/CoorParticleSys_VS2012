@@ -34,19 +34,19 @@ public:
 	bool deletePar(Particle* thispar);
 
 	int getIndexFromPos(ofVec2f pos);
-	bool getIndexTraversal(Particle thispar, int* realparindex, int* realgridindex);
-	int InGrid(int index, Particle thispar);
+	bool getIndexTraversal(Particle* thispar, int* realparindex, int* realgridindex);
+	int InGrid(int index, Particle* thispar);
 
 	void UpdatePar(Particle* thispar);
-	bool needUpdate(Particle thispar);
-	bool idUpdate(int old_id, Particle curPar);
+	bool needUpdate(Particle* thispar);
+	bool idUpdate(int old_id, Particle* curPar);
 
-	vector<Particle> CollisionDetection(Particle thispar);
-	void CheckCollisionInGrid(vector<Particle>* parlist, Particle thispar, int grid_id);
-	bool CheckPixelInGrid(vector<Particle>* parlist, Particle thispar);
-	bool Collide(int cur_pixel_id, Particle thispar);
+	vector<Particle>* CollisionDetection(Particle* thispar);
+	void CheckCollisionInGrid(vector<Particle>* parlist, Particle* thispar, int grid_id);
+	bool CheckPixelInGrid(vector<Particle>* parlist, Particle* thispar);
+	bool Collide(int cur_pixel_id, Particle* thispar);
 	int findpar(int beacon_id);
 	long int getbeacon(int pos);
 	//int GetParInGridPixel(int pixel_id);
-	bool StepsOnAGivenPar(Particle thispar, int beacon_id);
+	bool StepsOnAGivenPar(Particle* thispar, int beacon_id);
 };

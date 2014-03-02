@@ -65,15 +65,15 @@ int GridCollisionDetection::getIndexFromPos(ofVec2f pos)
 // Get the grid id by traversing the whole grids
 //
 //--------------------------------------------------
-bool GridCollisionDetection::getIndexTraversal(Particle thispar, int* realparindex, int* realgridindex)
+bool GridCollisionDetection::getIndexTraversal(Particle* thispar, int* realparindex, int* realgridindex)
 {
-	if(!thispar.OutOfBoudaryKill())
+	if(!thispar->OutOfBoudaryKill())
 	{
 		for(int i=0; i<grids.size(); i++)
 		{
 			for(int n=0; n<grids[i].grid_pars.size(); n++)
 			{
-				if(grids[i].grid_pars[n].id == thispar.id)
+				if(grids[i].grid_pars[n].id == thispar->id)
 				{
 					*realparindex = n;
 					*realgridindex = i;
@@ -91,7 +91,7 @@ bool GridCollisionDetection::getIndexTraversal(Particle thispar, int* realparind
 // Check if the particle is in the given grid
 //
 //--------------------------------------------------
-int GridCollisionDetection::InGrid(int index, Particle thispar)
+int GridCollisionDetection::InGrid(int index, Particle* thispar)
 {
 	//cout<<"Checking if it is in grid..."<<endl;
 	if(index>=0)
@@ -99,7 +99,7 @@ int GridCollisionDetection::InGrid(int index, Particle thispar)
 		//cout<<"grids.size = "<<grids.size()<<endl;
 		for(int i=0; i<grids[index].grid_pars.size(); i++)
 		{
-			if(thispar.id == grids[index].grid_pars[i].id)
+			if(thispar->id == grids[index].grid_pars[i].id)
 			{
 				//cout<<"In grid "<<index<<endl;
 				return i;	// the particle exist
@@ -167,14 +167,14 @@ bool GridCollisionDetection::insertPar(Particle* thispar)
 			////cout<<endl;
 
 
-				int size = 0;
-				for(int i=0; i<10000; i++)
-				{
-					if(size<grids[i].grid_pars.size())
-					{
-						size = grids[i].grid_pars.size();
-					}
-				}
+				//int size = 0;
+				//for(int i=0; i<10000; i++)
+				//{
+				//	if(size<grids[i].grid_pars.size())
+				//	{
+				//		size = grids[i].grid_pars.size();
+				//	}
+				//}
 			return true;
 		}
 	}
@@ -190,7 +190,7 @@ bool GridCollisionDetection::insertPar(Particle* thispar)
 // Check if the particle need to be updated
 //
 //--------------------------------------------------
-bool GridCollisionDetection::needUpdate(Particle thispar)
+bool GridCollisionDetection::needUpdate(Particle* thispar)
 {
 	
 	// if the particle move out of screen or move back
@@ -198,11 +198,11 @@ bool GridCollisionDetection::needUpdate(Particle thispar)
 		//return true;
 
 	// if the particle is released and move out of last recorded grid
-	if(thispar.Is_released)
+	if(thispar->Is_released)
 	{
 		////cout<<"Checking if needs update......"<<endl;
-		int curIndex = getIndexFromPos(thispar.pos);
-		int lastIndex = getIndexFromPos(thispar.last_pos);
+		int curIndex = getIndexFromPos(thispar->pos);
+		int lastIndex = getIndexFromPos(thispar->last_pos);
 		if(curIndex!=lastIndex)	
 			return true;
 	}
@@ -220,7 +220,7 @@ bool GridCollisionDetection::needUpdate(Particle thispar)
 bool GridCollisionDetection::deletePar(Particle* thispar)
 {
 	////cout<<"Deleting particle "<<thispar->id<<" in grid......"<<endl;
-	int parindex = InGrid(thispar->grid_id,*thispar);	// get the particle index in the recorded grid
+	int parindex = InGrid(thispar->grid_id,thispar);	// get the particle index in the recorded grid
 	int lastposindex = getIndexFromPos(thispar->last_pos);	// get the grid that the particle used to be in
 	
 	// if this particle is in the recorded grid rightfully
@@ -238,7 +238,7 @@ bool GridCollisionDetection::deletePar(Particle* thispar)
 	else if(lastposindex >= 0)
 	{
 		////cout<<"lastposindex = "<<lastposindex<<endl;
-		int lastparindex = InGrid(lastposindex,*thispar);
+		int lastparindex = InGrid(lastposindex,thispar);
 		if(lastparindex >= 0)
 		{
 			////cout<<"Erasing particle "<<thispar->id<<" in last grid "<<lastposindex<<endl;
@@ -255,7 +255,7 @@ bool GridCollisionDetection::deletePar(Particle* thispar)
 		{
 			int realparindex = -1;
 			int realgridindex = -1;
-			if(getIndexTraversal(*thispar, &realparindex, &realgridindex))	// if can find it somewhere
+			if(getIndexTraversal(thispar, &realparindex, &realgridindex))	// if can find it somewhere
 			{
 				////cout<<"Erasing particle "<<thispar->id<<" in a found grid "<<realgridindex<<endl;
 				grids[realgridindex].grid_pars.erase(grids[realgridindex].grid_pars.begin()+realparindex);
@@ -285,7 +285,7 @@ void GridCollisionDetection::UpdatePar(Particle* thispar)
 	// if the particle move across grids
 	// find it, delete it and insert it to the grid
 	//-----------------------------------------------------
-	if(needUpdate(*thispar))	
+	if(needUpdate(thispar))	
 	{
 		if(thispar->Is_released)
 		{
@@ -317,7 +317,7 @@ void GridCollisionDetection::UpdatePar(Particle* thispar)
 			}
 			else
 			{
-				cout<<endl;
+				//cout<<endl;
 				////cout<<"Warning: Cannot update (delete) released particle "<<thispar->id<<" because cannot find it in any grid. Now insert it..."<<endl;
 				// update the beacon id for the pixel
 				int px_index0 = floor(thispar->pos.x+0.5) + floor(thispar->pos.y+0.5) * ofGetWidth();	
@@ -353,7 +353,7 @@ void GridCollisionDetection::UpdatePar(Particle* thispar)
 	//-----------------------------------------------------
 	else if(thispar->Is_released)
 	{
-		int index = InGrid(thispar->grid_id,*thispar);
+		int index = InGrid(thispar->grid_id,thispar);
 		if(index >= 0)
 		{
 			//cout<<"Updating the position of particle "<<thispar->id<<endl; 
@@ -398,99 +398,98 @@ void GridCollisionDetection::UpdatePar(Particle* thispar)
 // Update the id for particles if the id has been changed
 //
 //-----------------------------------------------------------------------------------
-bool GridCollisionDetection::idUpdate(int old_id, Particle curPar)
+bool GridCollisionDetection::idUpdate(int old_id, Particle* curPar)
 {
 	////cout<<"idUpdate"<<endl;
-	if(curPar.grid_id>=0 && old_id >=0)
+	if(curPar->grid_id>=0 && old_id >=0)
 	{
-		for(int i = 0; i<grids[curPar.grid_id].grid_pars.size(); i++)
+		for(int i = 0; i<grids[curPar->grid_id].grid_pars.size(); i++)
 		{
-			if(grids[curPar.grid_id].grid_pars[i].id == old_id)
+			if(grids[curPar->grid_id].grid_pars[i].id == old_id)
 			{
-				grids[curPar.grid_id].grid_pars[i].id = curPar.id;
+				grids[curPar->grid_id].grid_pars[i].id = curPar->id;
 				////cout<<"Updated id for "<<old_id<<", now is "<<curPar.id<<endl;
 				return true;
 			}
 		}
 	}
-	else if(curPar.Is_released)
+	//else if(curPar->Is_released)
 		////cout<<"Warning: Cannot update id for particle "<<curPar.id<<endl;
 	return false;
 }
-
 
 //-----------------------------------------------------------------------
 //
 // Main entrance of collision detection, search all 9 grids for one par
 //
 //-----------------------------------------------------------------------
-vector<Particle> GridCollisionDetection::CollisionDetection(Particle thispar)
+vector<Particle>* GridCollisionDetection::CollisionDetection(Particle* thispar)
 {
 	////cout<<"collisionDetection......"<<endl;
 	//if(thispar.beacon_id == 706)
 	//	cout<<"here"<<endl;
-	vector<Particle> parlist;
+	vector<Particle>* parlist = new vector<Particle>;
 	// find the par
-	int thisparindex = InGrid(thispar.grid_id,thispar);
+	int thisparindex = InGrid(thispar->grid_id,thispar);
 	//if(thispar.pos.x>=470 && thispar.pos.x<= 483 || thispar.id==116)
 	//	cout<<endl;
 	if(thisparindex>=0)	// if finds it
 	{
-		parlist.reserve(REG_MAX_PARTICLES/2);	// initialize parlist
-		int grid_0 = thispar.grid_id-col_num-1;
-		int grid_1 = thispar.grid_id-col_num;
-		int grid_2 = thispar.grid_id-col_num+1;
-		int grid_3 = thispar.grid_id-1;
-		int grid_4 = thispar.grid_id;
-		int grid_5 = thispar.grid_id+1;
-		int grid_6 = thispar.grid_id+col_num-1;
-		int grid_7 = thispar.grid_id+col_num;
-		int grid_8 = thispar.grid_id+col_num+1;
+		//parlist.reserve(REG_MAX_PARTICLES/2);	// initialize parlist
+		int grid_0 = thispar->grid_id-col_num-1;
+		int grid_1 = thispar->grid_id-col_num;
+		int grid_2 = thispar->grid_id-col_num+1;
+		int grid_3 = thispar->grid_id-1;
+		int grid_4 = thispar->grid_id;
+		int grid_5 = thispar->grid_id+1;
+		int grid_6 = thispar->grid_id+col_num-1;
+		int grid_7 = thispar->grid_id+col_num;
+		int grid_8 = thispar->grid_id+col_num+1;
 
 		// Check 9 grids
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_0);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_0);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_1);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_1);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_2);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_2);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_3);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_3);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_4);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_4);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_5);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_5);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_6);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_6);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_7);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_7);
 
-		if(parlist.size()>=parlist.capacity()-1)
-			parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
-		CheckCollisionInGrid(&parlist, thispar, grid_8);
+		//if(parlist.size()>=parlist.capacity()-1)
+		//	parlist.reserve(REG_MAX_PARTICLES/2 + parlist.capacity());
+		CheckCollisionInGrid(parlist, thispar, grid_8);
 
 		// check if the particle are crossing any taken pixel if could not find any collision in previous code
 		//if(parlist.size()==0)
-			CheckPixelInGrid(&parlist,thispar);
+			CheckPixelInGrid(parlist,thispar);
 	}
 
-	else
-		cout<<"Warning: Cannot get the parlist for "<<thispar.id<<endl;
+	//else
+		//cout<<"Warning: Cannot get the parlist for "<<thispar.id<<endl;
 	return parlist;
 }
 
@@ -502,33 +501,33 @@ vector<Particle> GridCollisionDetection::CollisionDetection(Particle thispar)
 // update the parlist by checking the distance with other pars in a given grid
 //
 //--------------------------------------------------------------------------------------
-void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Particle thispar, int grid_id)
+void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Particle* thispar, int grid_id)
 {
 	// make sure the grid id is valid
 	////cout<<"CheckCollisionInGrid......"<<endl;
-	if(thispar.Is_released && grid_id>=0 && grid_id<grids.size())
+	if(thispar->Is_released && grid_id>=0 && grid_id<grids.size())
 	{
-		int prev = thispar.prev->beacon_id;
-		int next = thispar.next->beacon_id;
+		int prev = thispar->prev->beacon_id;
+		int next = thispar->next->beacon_id;
 		for(int i=0;i<grids[grid_id].grid_pars.size();i++) // for all the pars inside the grid
 		{
-			float dist = thispar.last_pos.distance(grids[grid_id].grid_pars[i].pos);// now that the pos is updated so we should use last_pos
+			float dist = thispar->last_pos.distance(grids[grid_id].grid_pars[i].pos);// now that the pos is updated so we should use last_pos
 			int collisionID = grids[grid_id].grid_pars[i].beacon_id;
 			// compare the distance with the predefined threshold
-			if(dist<=COLLISION_KILL_DIST && collisionID!=thispar.beacon_id)	// do not compare with itself
+			if(dist<=COLLISION_KILL_DIST && collisionID!=thispar->beacon_id)	// do not compare with itself
 			{
 				bool donotkill = false;
 				// check if it is one of the neighbors need to be killed
 				if(collisionID == prev || collisionID == next)
 				{
-					if(collisionID == prev && thispar.Is_newborn)	// it itself is newborn
+					if(collisionID == prev && thispar->Is_newborn)	// it itself is newborn
 					{
-						if(thispar.parentbeacon == prev && thispar.prev->childbeacon == thispar.beacon_id)	// goes apart from each other, do not kill
+						if(thispar->parentbeacon == prev && thispar->prev->childbeacon == thispar->beacon_id)	// goes apart from each other, do not kill
 							donotkill = true;
 					}
-					else if(collisionID == next && thispar.next->Is_newborn)	// its next is newborn
+					else if(collisionID == next && thispar->next->Is_newborn)	// its next is newborn
 					{
-						if(thispar.childbeacon == next && thispar.next->parentbeacon == thispar.beacon_id)	// goes apart from each other
+						if(thispar->childbeacon == next && thispar->next->parentbeacon == thispar->beacon_id)	// goes apart from each other
 							donotkill = true;
 					}
 					else if(grids[grid_id].grid_pars[i].Is_dying)	// if the candidate is dying, do not kil
@@ -549,9 +548,9 @@ void GridCollisionDetection::CheckCollisionInGrid(vector<Particle>* parlist, Par
 // Check if the particle is crossing a black pixel line
 //
 //----------------------------------------------------------------
-bool GridCollisionDetection::CheckPixelInGrid(vector<Particle>* parlist, Particle thispar)
+bool GridCollisionDetection::CheckPixelInGrid(vector<Particle>* parlist, Particle* thispar)
 {
-	if(thispar.Is_released/* && !thispar.Is_dying*/)
+	if(thispar->Is_released/* && !thispar.Is_dying*/)
 	{
 		//for(int j=thispar.pos.y-PIXEL_KILL_DIST; j>=0 && j<=thispar.pos.y+PIXEL_KILL_DIST && j<ofGetHeight(); j++)
 		//{
@@ -567,10 +566,10 @@ bool GridCollisionDetection::CheckPixelInGrid(vector<Particle>* parlist, Particl
 		//	}
 		//}
 		////cout<<"checking pixel in grid......"<<endl;
-		int cur_pixel_id0 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
-		int cur_pixel_id1 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
-		int cur_pixel_id2 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
-		int cur_pixel_id3 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
+		int cur_pixel_id0 = floor(thispar->pos.x+0.5) + floor(thispar->pos.y+0.5) * ofGetWidth();
+		int cur_pixel_id1 = floor(thispar->pos.x+1+0.5) + floor(thispar->pos.y+0.5) * ofGetWidth();
+		int cur_pixel_id2 = floor(thispar->pos.x+0.5) + floor(thispar->pos.y+1+0.5) * ofGetWidth();
+		int cur_pixel_id3 = floor(thispar->pos.x+1+0.5) + floor(thispar->pos.y+1+0.5) * ofGetWidth();
 		bool HasCollided = false;
 		if(cur_pixel_id0<0 || cur_pixel_id0>=ofGetWidth()*ofGetHeight())
 			cur_pixel_id0 = -1;
@@ -588,36 +587,36 @@ bool GridCollisionDetection::CheckPixelInGrid(vector<Particle>* parlist, Particl
 		{
 			//int par = findpar(grid_pixels[cur_pixel_id]);//---------------------------
 			////cout<<"particle "<<thispar.id<<" about to cross with beacon"<<endl;
-			parlist->push_back(thispar);	// only mark to kill itself, do not mark others
+			parlist->push_back(*thispar);	// only mark to kill itself, do not mark others
 			return true;
 		}
 	}
 	return false;
 }
 
-bool GridCollisionDetection::Collide(int cur_pixel_id, Particle thispar)
+bool GridCollisionDetection::Collide(int cur_pixel_id, Particle* thispar)
 {
 	bool donotkill = false;
-	if(cur_pixel_id >=0 && grid_pixels[cur_pixel_id]>=0 && grid_pixels[cur_pixel_id]!=thispar.beacon_id)	// if find some pixels have others' id
+	if(cur_pixel_id >=0 && grid_pixels[cur_pixel_id]>=0 && grid_pixels[cur_pixel_id]!=thispar->beacon_id)	// if find some pixels have others' id
 	{
 		//if collides with its newborn child
-		if(thispar.next->beacon_id == grid_pixels[cur_pixel_id] && thispar.next->Is_newborn && thispar.childbeacon == thispar.next->beacon_id)
+		if(thispar->next->beacon_id == grid_pixels[cur_pixel_id] && thispar->next->Is_newborn && thispar->childbeacon == thispar->next->beacon_id)
 			donotkill = true;
 		//if collides with its new parent
-		else if(thispar.prev->beacon_id == grid_pixels[cur_pixel_id] && thispar.Is_newborn && thispar.parentbeacon == thispar.prev->beacon_id)
+		else if(thispar->prev->beacon_id == grid_pixels[cur_pixel_id] && thispar->Is_newborn && thispar->parentbeacon == thispar->prev->beacon_id)
 			donotkill = true;
 		//if collides with its parent (in front of it)
-		else if(thispar.parentbeacon == thispar.prev->beacon_id && thispar.prev->beacon_id == grid_pixels[cur_pixel_id])
+		else if(thispar->parentbeacon == thispar->prev->beacon_id && thispar->prev->beacon_id == grid_pixels[cur_pixel_id])
 			donotkill = true;
 		//if collides with its parent (next to it)
-		else if(thispar.parentbeacon == thispar.next->beacon_id && thispar.next->beacon_id == grid_pixels[cur_pixel_id])
+		else if(thispar->parentbeacon == thispar->next->beacon_id && thispar->next->beacon_id == grid_pixels[cur_pixel_id])
 			donotkill = true;
 
 		//if collides with the one it's currently dying with (should not occur this case, can delete this later)
-		else if(grid_pixels[cur_pixel_id]==thispar.dyingwith)
+		else if(grid_pixels[cur_pixel_id]==thispar->dyingwith)
 			donotkill = true;
 		//if collides with (steps on) the one it just died with
-		else if(grid_pixels[cur_pixel_id]==thispar.diedwith)
+		else if(grid_pixels[cur_pixel_id]==thispar->diedwith)
 			donotkill = true;
 		//else if(thispar.Is_newborn)	// no need to enable this -- a particle who hasn't move out of its death zone will not give birth
 		//	donotkill = true;
@@ -629,18 +628,17 @@ bool GridCollisionDetection::Collide(int cur_pixel_id, Particle thispar)
 	}
 	return false;
 }
-
 //int GridCollisionDetection::GetParInGridPixel(int pixel_id)
 //{
 //	return grid_pixels[pixel_id];
 //}
 
-bool GridCollisionDetection::StepsOnAGivenPar(Particle thispar, int beacon_id)
+bool GridCollisionDetection::StepsOnAGivenPar(Particle* thispar, int beacon_id)
 {
-	int cur_pixel_id0 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
-	int cur_pixel_id1 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+0.5) * ofGetWidth();
-	int cur_pixel_id2 = floor(thispar.pos.x+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
-	int cur_pixel_id3 = floor(thispar.pos.x+1+0.5) + floor(thispar.pos.y+1+0.5) * ofGetWidth();
+	int cur_pixel_id0 = floor(thispar->pos.x+0.5) + floor(thispar->pos.y+0.5) * ofGetWidth();
+	int cur_pixel_id1 = floor(thispar->pos.x+1+0.5) + floor(thispar->pos.y+0.5) * ofGetWidth();
+	int cur_pixel_id2 = floor(thispar->pos.x+0.5) + floor(thispar->pos.y+1+0.5) * ofGetWidth();
+	int cur_pixel_id3 = floor(thispar->pos.x+1+0.5) + floor(thispar->pos.y+1+0.5) * ofGetWidth();
 
 	if(cur_pixel_id0<0 || cur_pixel_id0>=ofGetWidth()*ofGetHeight())
 		cur_pixel_id0 = -1;
