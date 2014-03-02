@@ -97,6 +97,7 @@
     <ClCompile Include="src\EdgeMap.cpp" />
     <ClCompile Include="src\GridCollisionDetection.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\makePDF.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\ParticleGroups.cpp" />
     <ClCompile Include="src\ParticleManager.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="src\EdgeMap.h" />
     <ClInclude Include="src\Gaussian.h" />
     <ClInclude Include="src\GridCollisionDetection.h" />
+    <ClInclude Include="src\makePDF.h" />
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\ParticleGroups.h" />
     <ClInclude Include="src\ParticleManager.h" />

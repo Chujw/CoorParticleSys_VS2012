@@ -506,9 +506,9 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	else
 		particle[numpt].Is_released = true;
 	particle[numpt].Is_visible = endpointA->Is_visible;
-	particle[numpt].visibility_timer = endpointA->visibility_timer;
-	particle[numpt].linewidth_timer_reg = endpointA->linewidth_timer_reg;
-	particle[numpt].linewidth_timer_zero = endpointA->linewidth_timer_zero;
+	//particle[numpt].visibility_timer = endpointA->visibility_timer;
+	//particle[numpt].linewidth_timer_reg = endpointA->linewidth_timer_reg;
+	//particle[numpt].linewidth_timer_zero = endpointA->linewidth_timer_zero;
 	particle[numpt].Was_released = particle[numpt].Is_released;
 	particle[numpt].Is_dying = false;
 	particle[numpt].c = COLOR;
@@ -650,12 +650,12 @@ void ParticleGroups::BoundaryControl_Foreground()
 		{
 			int indexID = indexPar->id;
 			indexPar = indexPar->next;
-			particle[indexID].visibility_timer++;
+			//particle[indexID].visibility_timer++;
 			// if this par moves out of window, do not kill, mark them as not released
 			// delete it from grids
 			if(particle[indexID].OutOfBoudaryKill())
 			{
-				particle[indexID].visibility_timer = 0;// if particles move out of window, do not accumulate the timer
+				//particle[indexID].visibility_timer = 0;// if particles move out of window, do not accumulate the timer
 				if(particle[indexID].Is_released)
 				{
 					particle[indexID].Was_released = particle[indexID].Is_released;
@@ -692,7 +692,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 				if(!particle[indexID].Is_released)
 				{ 
 					// keep checking all particles, if one moved out of open area and moved back, activate it again
-					particle[indexID].visibility_timer = VISIBILITY_TIMER_LIMIT; // set the timer as the limit, so it can change its boolean Is_visible
+					//particle[indexID].visibility_timer = VISIBILITY_TIMER_LIMIT; // set the timer as the limit, so it can change its boolean Is_visible
 					particle[indexID].Was_released = particle[indexID].Is_released;
 					particle[indexID].Is_released = true;
 					if(FillGrids&& !particle[indexID].Was_released && particle[indexID].Is_released) // wasn't released and now is
@@ -702,7 +702,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 				{
 					//if(particle[indexID].visibility_timer >= VISIBILITY_TIMER_LIMIT)
 					//{
-						particle[indexID].visibility_timer = 0;
+						//particle[indexID].visibility_timer = 0;
 						particle[indexID].Was_visible = particle[indexID].Is_visible;
 						particle[indexID].Is_visible = false;
 					//}
@@ -713,7 +713,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 					//{
 					// if the particle moves back to the foreground area
 					// set it as visible again
-						particle[indexID].visibility_timer = 0;	 // set back to zero
+						//particle[indexID].visibility_timer = 0;	 // set back to zero
 						particle[indexID].Was_visible = particle[indexID].Is_visible;
 						particle[indexID].Is_visible = true;
 					//}
@@ -751,12 +751,12 @@ void ParticleGroups::BoundaryControl_Window()
 		{
 			int indexID = indexPar->id;
 			indexPar = indexPar->next;
-			particle[indexID].visibility_timer++;
+			//particle[indexID].visibility_timer++;
 			// if this par moves out of boundary, do not kill, instead make them move in backstage
 			// delete it from grids
 			if(particle[indexID].OutOfBoudaryKill())	
 			{
-				particle[indexID].visibility_timer = 0;
+				//particle[indexID].visibility_timer = 0;
 				particle[indexID].Was_released = particle[indexID].Is_released;
 				particle[indexID].Is_released = false;	// if false, don't draw it, just deactive the birth and death
 				particle[indexID].Was_visible = particle[indexID].Is_visible;
@@ -770,7 +770,7 @@ void ParticleGroups::BoundaryControl_Window()
 			{
 				if(!particle[indexID].Is_released)		// keep checking all particles, if one moved out of boudary and move back, activate it again
 				{
-					particle[indexID].visibility_timer = VISIBILITY_TIMER_LIMIT;
+					//particle[indexID].visibility_timer = VISIBILITY_TIMER_LIMIT;
 					particle[indexID].Was_released = particle[indexID].Is_released;
 					particle[indexID].Is_released = true;
 					if(FillGrids&& !particle[indexID].Was_released && particle[indexID].Is_released)
@@ -778,7 +778,7 @@ void ParticleGroups::BoundaryControl_Window()
 				}
 				//if(particle[indexID].visibility_timer>=VISIBILITY_TIMER_LIMIT)
 				//{
-					particle[indexID].visibility_timer = 0;
+					//particle[indexID].visibility_timer = 0;
 					particle[indexID].Was_visible = particle[indexID].Is_visible;
 					particle[indexID].Is_visible = true;
 					

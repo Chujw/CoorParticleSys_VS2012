@@ -30,5 +30,6 @@ class testApp : public ofBaseApp{
 		bool bStop;					// stop 
 		bool showEGmap;				// show edge map
 		bool nowSaveImage;
+		bool pdfmaker;
 		string cmd;
 };
