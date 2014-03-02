@@ -14,7 +14,7 @@ void testApp::setup(){
 	bStop = false;
 	showEGmap = false;
 	nowSaveImage = false;
-	cmd = "default";
+	cmd = "run";
 	snapCounter = 0;
 	ofBackground(255,255,255);
 	ofSetBackgroundAuto(false);

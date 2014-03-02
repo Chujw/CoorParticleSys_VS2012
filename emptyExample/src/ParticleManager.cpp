@@ -48,7 +48,7 @@ void ParticleManager::CreateEdgeChain()
 	// Create backgroud edge chain
 	m_bkgEdgechain = edgemap[num_map].MakeBkgEdgeChains(BKG_START,BKG_END,&bkgpar_numpt,m_spacing.GetDefaultSpacing());
 	// pass the particle distribution list to groups
-	parGroup[0].Setup_parlist_bkg(m_bkgEdgechain,bkgpar_numpt,m_spacing);	// closed contour particles list
+	parGroup[0].Setup_parlist_bkg(m_bkgEdgechain,bkgpar_numpt,&m_spacing);	// closed contour particles list
 	// setup the map of open areas
 	int allpixels_num = 0;
 	ofVec2f* AllPixelsInChain = edgemap[num_map].GetAllPixelsInChain(&allpixels_num);
@@ -64,7 +64,7 @@ void ParticleManager::CreateEdgeChain()
 	else
 	{	// get the open edge chain list
 		m_lineEdgechain = edgemap[num_map].GetForgEdgeChain();// will change the m_lineEdgechain
-		parGroup[1].Setup_parlist_forg(m_lineEdgechain,linepar_numpt,m_spacing);	
+		parGroup[1].Setup_parlist_forg(m_lineEdgechain,linepar_numpt,&m_spacing);	
 		parGroup[1].Setup_Foreground_map(AllPixelsInChain, allpixels_num);
 	}
 	////----------------------------------------------------
@@ -87,7 +87,7 @@ void ParticleManager::Simulate(ofImage* canvas)
 	{
 		// uncomment it if need a third group
 		if(!parGroup[0].GetStopSignal())
-			parGroup[0].Simulate(m_spacing, canvas);
+			parGroup[0].Simulate(&m_spacing, canvas);
 		//
 		//else if(!parGroup[2].GetStopSignal())
 		//	parGroup[2].Simulate(m_spacing, canvas);
@@ -101,7 +101,7 @@ void ParticleManager::Simulate(ofImage* canvas)
 			saveimage.saveImage("2ndGroup.png");
 			Saved1stGroup = true;
 			}
-			parGroup[1].Simulate(m_spacing, canvas);
+			parGroup[1].Simulate(&m_spacing, canvas);
 		}
 		else
 		{	Mngr_canstop = true;

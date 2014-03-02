@@ -38,7 +38,7 @@ void ParticleGroups::Setup()
 // Setup particle list for close contour area
 //
 //---------------------------------------------
-void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_numpt, SpacingMap m_spacing)
+void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_numpt, SpacingMap* m_spacing)
 {
 	Is_Foreground = false; // this par group will work for close area
 	numpt = closepar_numpt;
@@ -86,7 +86,7 @@ void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_num
 			particle[i].next = &particle[(i+1)%numpt];
 			particle[i].prev->next = &particle[i];
 		}
-		particle[i].last_spacing_threshold = m_spacing.GetBaseThreshold(particle[i].pos.x,particle[i].pos.y);	// set up base threshold for each par
+		particle[i].last_spacing_threshold = m_spacing->GetBaseThreshold(particle[i].pos.x,particle[i].pos.y);	// set up base threshold for each par
 		particle[i].linewidth = particle[i].UpdateLineWidth(particle[i].last_spacing_threshold,MIN_SP_VIABLE,MAX_SP_VIABLE);
 	}
 	head_par = 0;
@@ -94,12 +94,13 @@ void ParticleGroups::Setup_parlist_bkg(ofVec2f* closeEdgechain, int closepar_num
 }
 
 
+
 //-----------------------------------------------------------
 //
 // Setup particle list for open area
 //	in open area, pars moves to a main predefined direction
 //-----------------------------------------------------------
-void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_numpt, SpacingMap m_spacing)
+void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_numpt, SpacingMap* m_spacing)
 {
 	cout<<"Setting up the parlist for open areas..."<<endl;
 	Is_Foreground = true;	// this par group will work for open area
@@ -154,7 +155,7 @@ void ParticleGroups::Setup_parlist_forg(ofVec2f* openEdgechain, int openpar_nump
 			particle[i].next = &particle[(i+1)%numpt];
 			particle[i].prev->next = &particle[i];
 		}
-		particle[i].last_spacing_threshold = m_spacing.GetBaseThreshold(particle[i].pos.x,particle[i].pos.y);	// set up base threshold for each par
+		particle[i].last_spacing_threshold = m_spacing->GetBaseThreshold(particle[i].pos.x,particle[i].pos.y);	// set up base threshold for each par
 		particle[i].linewidth = particle[i].UpdateLineWidth(particle[i].last_spacing_threshold,MIN_SP_VIABLE,MAX_SP_VIABLE);
 	}
 	head_par = 0;
@@ -315,7 +316,7 @@ void ParticleGroups::DrawAll(ofImage* m_canvas)
 // Main loop of the simulation
 //
 //---------------------------------------------
-void ParticleGroups::Simulate(SpacingMap m_spacing, ofImage* m_canvas)
+void ParticleGroups::Simulate(SpacingMap* m_spacing, ofImage* m_canvas)
 {
 	if(!canstop)
 	{
@@ -378,7 +379,7 @@ void ParticleGroups::TiltControl(Particle* thispar)
 //---------------------------------------------
 
 //---------------------------------------------
-void ParticleGroups::Birth_Death(SpacingMap m_spacing)
+void ParticleGroups::Birth_Death(SpacingMap* m_spacing)
 {
 	bool continueLoop = true;
 	Particle *index_par = &particle[head_par];// start from the first particle
@@ -386,7 +387,7 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 	do
 	{
 		Particle *endpointB = endpointA->next;	// mark the endpoint B as the next par
-		Particle tempA = *endpointA;
+		int tempA_ID = endpointA->id;
 		int tempBeacon = endpointA->beacon_id;
 		//----------------------------------------------------------
 		// Compute the threshold and spacing viables for this pixel
@@ -397,8 +398,8 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 		float Bpixel_threshold = endpointB->last_spacing_threshold;	
 		if(endpointA->Is_released && endpointB->Is_released)
 		{	// get the threshold of pixels at points A and B's positions; update the last_spacing stored in particles later
-			Apixel_threshold = m_spacing.GetBaseThreshold(endpointA->pos.x,endpointA->pos.y); // the threshold at pixel A
-			Bpixel_threshold = m_spacing.GetBaseThreshold(endpointB->pos.x,endpointB->pos.y); // the threshold at pixel B
+			Apixel_threshold = m_spacing->GetBaseThreshold(endpointA->pos.x,endpointA->pos.y); // the threshold at pixel A
+			Bpixel_threshold = m_spacing->GetBaseThreshold(endpointB->pos.x,endpointB->pos.y); // the threshold at pixel B
 		}
 
 		// update the pars' info about Is_newborn before checking birth and death
@@ -419,16 +420,18 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 				{
 					endpointA->Is_dying = true;
 					endpointA->dyingwith = endpointB->beacon_id;
+					//endpointA->musthavepoint = true;
 				}
 				if(!endpointB->Is_dying)
 				{
 					endpointB->Is_dying = true;
 					endpointB->dyingwith = endpointA->beacon_id;
+					//endpointB->musthavepoint = true;
 					//cout<<endpointA->beacon_id<<" and "<<endpointB->beacon_id<<" are dying..."<<endl;
 				}
-				if(tempA.id == numpt-1)	// if A is the last one (A will be deleted)
+				if(tempA_ID == numpt-1)	// if A is the last one (A will be deleted)
 				{
-					tempA = *endpointB;
+					Particle tempA = *endpointB;
 					death(endpointA, endpointB);
 					endpointA = &tempA;
 				}
@@ -462,24 +465,19 @@ void ParticleGroups::Birth_Death(SpacingMap m_spacing)
 // birth control
 //
 //---------------------------------------------
-void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap m_spacing)
+void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap* m_spacing)
 {
 	//if(numpt==CHAIN_NUM-1)
 	//	cout<<"Warning: numpt is "<<numpt<<" now."<<endl;
 	particle[numpt].pos = endpointA->pos;	// create from the A's position
+	//if(endpointA->Is_visible || Is_Foreground)
+	//	particle[numpt].makepdf.growfromanotherpath(endpointA->makepdf.GetPath());
 	particle[numpt].last_pos = particle[numpt].pos;
 	particle[numpt].crushAt = particle[numpt].pos;
 	particle[numpt].id = numpt;
 	particle[numpt].beacon_id = beacon_num;
-
-	//---------------------------------------------------------------------------------
-	//particle[numpt].bearing_vec = (endpointA->bearing_vec + endpointB->bearing_vec)/2;	// the new direction is the average one
-	//particle[numpt].bearing_vec.normalize();
-	//particle[numpt].bearing = acos(particle[numpt].bearing_vec.dot(ofVec2f(0,1)));
-	//if(particle[numpt].bearing_vec.x<0)
-	//	particle[numpt].bearing = 2*PI-particle[numpt].bearing;
-	//particle[numpt].angle = degrees(particle[numpt].bearing);
 				
+	//-------------------------new bearing----------------------------------------------
 	particle[numpt].bearing = endpointA->bearing - radians(15);
 	particle[numpt].bearing_vec = ofVec2f(sin(particle[numpt].bearing),cos(particle[numpt].bearing));
 	particle[numpt].bearing_vec.normalize();
@@ -499,6 +497,9 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	particle[numpt].tilt_limit = TILT_LIMIT;
 	particle[numpt].tilt_control = 0;
 	particle[numpt].Is_newborn = true;
+	//if(endpointA->Is_visible)
+	//	particle[numpt].musthavepoint = true; // store this position for making PDF
+	//endpointA->musthavepoint = true; 
 	if(particle[numpt].pos.x < 0 || particle[numpt].pos.x >= ofGetWidth() || particle[numpt].pos.y <0 || particle[numpt].pos.y >= ofGetHeight())
 		particle[numpt].Is_released = false;
 	//else if(Is_Foreground && OutOfFeatureMap(particle[numpt]))	// check for foreground areas
@@ -506,9 +507,6 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	else
 		particle[numpt].Is_released = true;
 	particle[numpt].Is_visible = endpointA->Is_visible;
-	//particle[numpt].visibility_timer = endpointA->visibility_timer;
-	//particle[numpt].linewidth_timer_reg = endpointA->linewidth_timer_reg;
-	//particle[numpt].linewidth_timer_zero = endpointA->linewidth_timer_zero;
 	particle[numpt].Was_released = particle[numpt].Is_released;
 	particle[numpt].Is_dying = false;
 	particle[numpt].c = COLOR;
@@ -524,7 +522,7 @@ void ParticleGroups::birth(Particle* endpointA, Particle* endpointB, SpacingMap 
 	if(particle[numpt].Is_released)
 	{
 		// the new spacing threshold will be the average of A, B and the threshold stored in current pixel
-		particle[numpt].last_spacing_threshold = (endpointA->last_spacing_threshold + endpointB->last_spacing_threshold + m_spacing.GetBaseThreshold(particle[numpt].pos.x,particle[numpt].pos.y))/3;
+		particle[numpt].last_spacing_threshold = (endpointA->last_spacing_threshold + endpointB->last_spacing_threshold + m_spacing->GetBaseThreshold(particle[numpt].pos.x,particle[numpt].pos.y))/3;
 		//particle[numpt].linewidth = particle[numpt].UpdateLineWidth(m_spacing.GetBaseThreshold(particle[numpt].pos.x,particle[numpt].pos.y),MIN_SP_VIABLE,MAX_SP_VIABLE);
 	}
 	else
@@ -698,7 +696,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 					if(FillGrids&& !particle[indexID].Was_released && particle[indexID].Is_released) // wasn't released and now is
 						grid.insertPar(&particle[indexID]);
 				}
-				if(OutOfFeatureMap(particle[indexID]) && particle[indexID].Is_visible)
+				if(OutOfFeatureMap(&particle[indexID]) && particle[indexID].Is_visible)
 				{
 					//if(particle[indexID].visibility_timer >= VISIBILITY_TIMER_LIMIT)
 					//{
@@ -707,7 +705,7 @@ void ParticleGroups::BoundaryControl_Foreground()
 						particle[indexID].Is_visible = false;
 					//}
 				}
-				else if(!OutOfFeatureMap(particle[indexID]) && !particle[indexID].Is_visible)
+				else if(!OutOfFeatureMap(&particle[indexID]) && !particle[indexID].Is_visible)
 				{
 					//if(particle[indexID].visibility_timer >= VISIBILITY_TIMER_LIMIT)
 					//{
@@ -726,10 +724,10 @@ void ParticleGroups::BoundaryControl_Foreground()
 }
 
 
-bool ParticleGroups::OutOfFeatureMap(Particle thispar)
+bool ParticleGroups::OutOfFeatureMap(Particle* thispar)
 {
 	// find the par in OpenArea_map
-	int index = floor(thispar.pos.x+0.5)+floor(thispar.pos.y+0.5)*ofGetWidth();
+	int index = floor(thispar->pos.x+0.5)+floor(thispar->pos.y+0.5)*ofGetWidth();
 	if(Foreground_map[index])
 		return false;	// current position is inside the open area
 	else

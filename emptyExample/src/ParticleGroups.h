@@ -39,16 +39,16 @@ private:
 
 public:
 	void Setup();
-	void Setup_parlist_bkg(ofVec2f* parlist, int closepar_numpt, SpacingMap m_spacing);
-	void Setup_parlist_forg(ofVec2f* parlist,int openpar_numpt,SpacingMap m_spacing);
+	void Setup_parlist_bkg(ofVec2f* parlist, int closepar_numpt, SpacingMap* m_spacing);
+	void Setup_parlist_forg(ofVec2f* parlist,int openpar_numpt,SpacingMap* m_spacing);
 	void Setup_Background_map(ofVec2f* AllPixelsInChain, int allpixels_num);	// setup the map of open area via parlist
 	void Setup_Foreground_map(ofVec2f* AllPixelsInChain, int allpixels_num);	// setup the map of open area via parlist
 	void Setup_2ndForeground_map(ofVec2f* AllPixelsInChain, int allpixels_num);
-	void Simulate(SpacingMap m_spacing, ofImage* m_canvas);
+	void Simulate(SpacingMap* m_spacing, ofImage* m_canvas);
 
 	void DrawAll(ofImage* m_canvas);	
-	void Birth_Death(SpacingMap m_spacing);
-	void birth(Particle* endpointA, Particle* endpointB, SpacingMap m_spacing);
+	void Birth_Death(SpacingMap* m_spacing);
+	void birth(Particle* endpointA, Particle* endpointB, SpacingMap* m_spacing);
 	void death(Particle* endpointA, Particle* endpointB);
 	void TiltUpdate(Particle* thispar);
 	void TiltControl(Particle* thispar);	
@@ -59,7 +59,7 @@ public:
 	void BoundaryControl_Window();
 	void BoundaryControl_Foreground();
 
-	bool OutOfFeatureMap(Particle thispar);
+	bool OutOfFeatureMap(Particle* thispar);
 
 	void kill(int indexID);
 	void SetAsRegular(Particle* A, Particle* B, float birth_dist);
